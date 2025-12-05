@@ -8,6 +8,7 @@ use App\Repository\MovementExceptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: MovementExceptionRepository::class)]
 #[ApiResource(
@@ -42,13 +43,13 @@ class MovementException
     #[Groups(['exception:read','exception:write'])]
     private ?string $amount = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     #[Groups(['exception:read','exception:write'])]
-    private ?\DateTimeInterface $startDate = null;
+    private ?DateTimeImmutable $startDate = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     #[Groups(['exception:read','exception:write'])]
-    private ?\DateTimeInterface $endDate = null;
+    private ?DateTimeImmutable $endDate = null;
 
     #[ORM\Column(length: 20)]
     #[Groups(['exception:read','exception:write'])]
@@ -58,9 +59,9 @@ class MovementException
     #[Groups(['exception:read','exception:write'])]
     private ?int $frequencyN = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['exception:read'])]
-    private ?\DateTimeInterface $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -108,19 +109,19 @@ class MovementException
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTime $startDate): static
+    public function setStartDate(DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getEndDate(): ?\DateTime
+    public function getEndDate(): ?DateTimeImmutable
     {
         return $this->endDate;
     }
 
-    public function setEndDate(?\DateTime $endDate): static
+    public function setEndDate(?DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
 
@@ -156,7 +157,7 @@ class MovementException
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 

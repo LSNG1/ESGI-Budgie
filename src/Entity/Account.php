@@ -9,18 +9,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use DateTimeImmutable;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(security: "is_granted('ACCOUNT_VIEW', object)"),
-        new GetCollection(security: "is_granted('ROLE_USER')"),
-        new Post(
-            securityPostDenormalize: "is_granted('ACCOUNT_CREATE', object)"
-        ),
-        new Patch(security: "is_granted('ACCOUNT_EDIT', object)"),
-        new Delete(security: "is_granted('ACCOUNT_EDIT', object)")
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Patch(),
+        new Delete()
     ],
     normalizationContext: ['groups' => ['account:read']],
     denormalizationContext: ['groups' => ['account:write']]
@@ -57,9 +56,9 @@ class Account
     #[Groups(['account:read','account:write'])]
     private ?string $overdraft = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['account:read'])]
-    private ?\DateTimeInterface $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     /**
      * @var Collection<int, Movement>
@@ -70,6 +69,7 @@ class Account
     public function __construct()
     {
         $this->movements = new ArrayCollection();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int

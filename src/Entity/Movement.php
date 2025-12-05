@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: MovementRepository::class)]
 #[ApiResource(
@@ -65,21 +66,21 @@ class Movement
     #[Groups(['movement:read','movement:write'])]
     private ?int $frequencyN = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date_immutable')]
     #[Groups(['movement:read','movement:write'])]
-    private ?\DateTimeInterface $startDate = null;
+    private ?DateTimeImmutable $startDate = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     #[Groups(['movement:read','movement:write'])]
-    private ?\DateTimeInterface $endDate = null;
+    private ?DateTimeImmutable $endDate = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['movement:read'])]
-    private ?\DateTimeInterface $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['movement:read'])]
-    private ?\DateTimeInterface $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     /**
      * @var Collection<int, MovementException>
@@ -193,24 +194,24 @@ class Movement
         return $this;
     }
 
-    public function getStartDate(): ?\DateTime
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTime $startDate): static
+    public function setStartDate(DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getEndDate(): ?\DateTime
+    public function getEndDate(): ?DateTimeImmutable
     {
         return $this->endDate;
     }
 
-    public function setEndDate(?\DateTime $endDate): static
+    public function setEndDate(?DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
 
@@ -222,7 +223,7 @@ class Movement
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
