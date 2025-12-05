@@ -2,40 +2,64 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
 use App\Repository\AccountRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ACCOUNT_VIEW', object)"),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Post(
+            securityPostDenormalize: "is_granted('ACCOUNT_CREATE', object)"
+        ),
+        new Patch(security: "is_granted('ACCOUNT_EDIT', object)"),
+        new Delete(security: "is_granted('ACCOUNT_EDIT', object)")
+    ],
+    normalizationContext: ['groups' => ['account:read']],
+    denormalizationContext: ['groups' => ['account:write']]
+)]
 class Account
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['account:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['account:read','account:write'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['account:read','account:write'])]
     private ?string $type = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['account:read','account:write'])]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 4)]
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 4)]
+    #[Groups(['account:read','account:write'])]
     private ?string $taxRate = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 4)]
+    #[ORM\Column(type: 'decimal', precision: 6, scale: 4)]
+    #[Groups(['account:read','account:write'])]
     private ?string $rateOfPay = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 4)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
+    #[Groups(['account:read','account:write'])]
     private ?string $overdraft = null;
 
-    #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['account:read'])]
+    private ?\DateTimeInterface $createdAt = null;
 
     /**
      * @var Collection<int, Movement>

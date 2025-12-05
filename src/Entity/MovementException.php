@@ -2,42 +2,65 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
 use App\Repository\MovementExceptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MovementExceptionRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ACCOUNT_VIEW', object.getMovement().getAccount())"),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Post(securityPostDenormalize: "is_granted('ACCOUNT_EDIT', object.getMovement().getAccount())"),
+        new Patch(security: "is_granted('ACCOUNT_EDIT', object.getMovement().getAccount())"),
+        new Delete(security: "is_granted('ACCOUNT_EDIT', object.getMovement().getAccount())")
+    ],
+    normalizationContext: ['groups' => ['exception:read']],
+    denormalizationContext: ['groups' => ['exception:write']]
+)]
 class MovementException
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['exception:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'exceptions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['exception:read','exception:write'])]
     private ?Movement $movement = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['exception:read','exception:write'])]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['exception:read','exception:write'])]
     private ?string $amount = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $startDate = null;
+    #[ORM\Column(type: 'date')]
+    #[Groups(['exception:read','exception:write'])]
+    private ?\DateTimeInterface $startDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $endDate = null;
+    #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(['exception:read','exception:write'])]
+    private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['exception:read','exception:write'])]
     private ?string $frequencyType = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['exception:read','exception:write'])]
     private ?int $frequencyN = null;
 
-    #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['exception:read'])]
+    private ?\DateTimeInterface $createdAt = null;
 
     public function getId(): ?int
     {

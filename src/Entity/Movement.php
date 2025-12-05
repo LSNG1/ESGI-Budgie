@@ -2,57 +2,84 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
 use App\Repository\MovementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MovementRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ACCOUNT_VIEW', object.getAccount())"),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new Post(securityPostDenormalize: "is_granted('ACCOUNT_EDIT', object.getAccount())"),
+        new Patch(security: "is_granted('ACCOUNT_EDIT', object.getAccount())"),
+        new Delete(security: "is_granted('ACCOUNT_EDIT', object.getAccount())")
+    ],
+    normalizationContext: ['groups' => ['movement:read']],
+    denormalizationContext: ['groups' => ['movement:write']]
+)]
 class Movement
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['movement:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'movements')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['movement:read','movement:write'])]
     private ?Account $account = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['movement:read'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['movement:read','movement:write'])]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['movement:read','movement:write'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 20)]
-    private ?string $type = null;
+    #[Groups(['movement:read','movement:write'])]
+    private ?string $type = null; // 'income' / 'expense'
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
+    #[Groups(['movement:read','movement:write'])]
     private ?string $amount = null;
 
     #[ORM\Column(length: 20)]
-    private ?string $frequencyType = null;
+    #[Groups(['movement:read','movement:write'])]
+    private ?string $frequencyType = null; // 'once' / 'every_n_months'
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['movement:read','movement:write'])]
     private ?int $frequencyN = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $startDate = null;
+    #[ORM\Column(type: 'date')]
+    #[Groups(['movement:read','movement:write'])]
+    private ?\DateTimeInterface $startDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $endDate = null;
+    #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(['movement:read','movement:write'])]
+    private ?\DateTimeInterface $endDate = null;
 
-    #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['movement:read'])]
+    private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTime $updatedAt = null;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['movement:read'])]
+    private ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var Collection<int, MovementException>
