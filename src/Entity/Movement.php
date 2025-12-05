@@ -15,11 +15,11 @@ use DateTimeImmutable;
 #[ORM\Entity(repositoryClass: MovementRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(security: "is_granted('ACCOUNT_VIEW', object.getAccount())"),
-        new GetCollection(security: "is_granted('ROLE_USER')"),
-        new Post(securityPostDenormalize: "is_granted('ACCOUNT_EDIT', object.getAccount())"),
-        new Patch(security: "is_granted('ACCOUNT_EDIT', object.getAccount())"),
-        new Delete(security: "is_granted('ACCOUNT_EDIT', object.getAccount())")
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Patch(),
+        new Delete()
     ],
     normalizationContext: ['groups' => ['movement:read']],
     denormalizationContext: ['groups' => ['movement:write']]
@@ -90,6 +90,7 @@ class Movement
 
     public function __construct()
     {
+        $this->createdAt = new DateTimeImmutable();
         $this->exceptions = new ArrayCollection();
     }
 
@@ -218,7 +219,7 @@ class Movement
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -230,12 +231,12 @@ class Movement
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

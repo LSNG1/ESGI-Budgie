@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use DateTimeImmutable;
 #[ORM\Entity(repositoryClass: UserAccountRepository::class)]
 class UserAccount
 {
@@ -25,7 +25,7 @@ class UserAccount
     private ?string $role = null;
 
     #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -68,12 +68,12 @@ class UserAccount
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 

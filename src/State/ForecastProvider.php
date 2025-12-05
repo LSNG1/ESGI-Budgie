@@ -10,7 +10,6 @@ use App\Service\ForecastCalculator;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ForecastProvider implements ProviderInterface
 {
@@ -18,7 +17,6 @@ class ForecastProvider implements ProviderInterface
         private EntityManagerInterface $em,
         private ForecastCalculator $calculator,
         private RequestStack $requestStack,
-        private AuthorizationCheckerInterface $auth
     ) {
     }
 
@@ -28,10 +26,6 @@ class ForecastProvider implements ProviderInterface
         $account = $this->em->getRepository(Account::class)->find($accountId);
 
         if (!$account) {
-            return null;
-        }
-
-        if (!$this->auth->isGranted('ACCOUNT_VIEW', $account)) {
             return null;
         }
 
