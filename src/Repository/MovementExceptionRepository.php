@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Movement;
+use App\Entity\MovementException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Movement>
+ * @extends ServiceEntityRepository<MovementException>
  */
-class MovementRepository extends ServiceEntityRepository
+class MovementExceptionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Movement::class);
+        parent::__construct($registry, MovementException::class);
     }
 
     //    /**
-    //     * @return Movement[] Returns an array of Movement objects
+    //     * @return MovementException[] Returns an array of MovementException objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class MovementRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Movement
+    //    public function findOneBySomeField($value): ?MovementException
     //    {
     //        return $this->createQueryBuilder('m')
     //            ->andWhere('m.exampleField = :val')

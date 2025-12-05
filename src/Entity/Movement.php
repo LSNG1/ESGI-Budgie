@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MovementRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -51,6 +53,17 @@ class Movement
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $updatedAt = null;
+
+    /**
+     * @var Collection<int, MovementException>
+     */
+    #[ORM\OneToMany(targetEntity: MovementException::class, mappedBy: 'movement')]
+    private Collection $exceptions;
+
+    public function __construct()
+    {
+        $this->exceptions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -197,6 +210,36 @@ class Movement
     public function setUpdatedAt(?\DateTime $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MovementException>
+     */
+    public function getExceptions(): Collection
+    {
+        return $this->exceptions;
+    }
+
+    public function addException(MovementException $exception): static
+    {
+        if (!$this->exceptions->contains($exception)) {
+            $this->exceptions->add($exception);
+            $exception->setMovement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeException(MovementException $exception): static
+    {
+        if ($this->exceptions->removeElement($exception)) {
+            // set the owning side to null (unless already changed)
+            if ($exception->getMovement() === $this) {
+                $exception->setMovement(null);
+            }
+        }
 
         return $this;
     }
