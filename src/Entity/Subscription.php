@@ -3,19 +3,22 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
 use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 #[ApiResource(
     operations: [
+        new Get(),
         new GetCollection(),
-        new Get()
+        new Post(),
+        new Patch(),
+        new Delete()
     ],
     normalizationContext: ['groups' => ['subscription:read']],
+    denormalizationContext: ['groups' => ['subscription:write']]
 )]
 class Subscription
 {
@@ -26,19 +29,19 @@ class Subscription
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['subscription:read'])]
+    #[Groups(['subscription:read', 'subscription:write'])]
     private ?string $name = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['subscription:read'])]
+    #[Groups(['subscription:read', 'subscription:write'])]
     private ?int $maxAccounts = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['subscription:read'])]
+    #[Groups(['subscription:read', 'subscription:write'])]
     private ?int $maxIncomes = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['subscription:read'])]
+    #[Groups(['subscription:read', 'subscription:write'])]
     private ?int $maxExpenses = null;
 
     public function getId(): ?int

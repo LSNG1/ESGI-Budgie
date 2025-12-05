@@ -63,6 +63,11 @@ class MovementException
     #[Groups(['exception:read'])]
     private ?DateTimeImmutable $createdAt = null;
 
+    public function __construct()
+    {
+        $this->createdAt = new DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
