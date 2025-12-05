@@ -79,33 +79,49 @@ This will install all required PHP dependencies including Symfony, API Platform,
 
 ## ⚙ Configuration
 
-### 1. Environment Variables
+### Important: Environment Files Security
 
-Copy the `.env` file and create a `.env.local` file for your local configuration:
+⚠️ **CRITICAL**: The `.env` file is **NOT tracked in git** and contains your actual credentials. Use `.env.example` as a template.
+
+**File Structure:**
+- **`.env.example`** - Tracked in git, contains placeholder values (safe to share)
+- **`.env`** - **IGNORED by git**, contains your actual secrets (**NEVER COMMIT!**)
+- **`.env.local`** - Also ignored, can be used for additional local overrides
+- **`.env.dev`** - Tracked in git, contains dev environment defaults (no secrets)
+
+### 1. Create Your Environment File
+
+Copy `.env.example` to `.env` and configure it:
 
 ```bash
-cp .env .env.local
+# On Linux/Mac
+cp .env.example .env
+
+# On Windows
+copy .env.example .env
 ```
 
 ### 2. Configure the Database
 
-Edit your `.env.local` file and configure the database connection:
+Edit your **`.env`** file (which is ignored by git) and add your real database credentials:
 
 #### For MySQL:
 
+In your `.env` file, update the DATABASE_URL with your real credentials:
+
 ```env
-DATABASE_URL="mysql://username:password@localhost:3306/budgie?serverVersion=9.5&charset=utf8mb4"
+DATABASE_URL="mysql://root:your_actual_password@localhost:3306/budgie?serverVersion=9.5&charset=utf8mb4"
 ```
 
 Replace:
-- `username` with your MySQL username
-- `password` with your MySQL password
+- `root` with your MySQL username
+- `your_actual_password` with your real MySQL password
 - `localhost:3306` with your MySQL host and port if different
 - `budgie` with your desired database name
 
 #### For PostgreSQL (Docker):
 
-If using the provided Docker setup:
+If using the provided Docker setup, update in your `.env`:
 
 ```env
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
@@ -113,18 +129,60 @@ DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&ch
 
 ### 3. Configure Application Secret
 
-Generate a secure APP_SECRET or use the provided one:
+In your `.env` file, generate and set a secure APP_SECRET:
+
+```bash
+# Generate a secure secret using PHP
+php -r "echo bin2hex(random_bytes(32)) . PHP_EOL;"
+
+# Or using OpenSSL
+openssl rand -hex 32
+```
+
+Then add it to your `.env`:
 
 ```env
-APP_SECRET=your-secure-random-secret-here
+APP_SECRET=your_generated_secret_here
 ```
 
 ### 4. Configure CORS (Optional)
 
-If you need to customize CORS settings:
+If you need to customize CORS settings in your `.env`:
 
 ```env
 CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+```
+
+### 5. 🔐 Security: Remove .env from Git History (If Already Committed)
+
+If you previously committed `.env` with real credentials, you **MUST** remove it from git history:
+
+```bash
+# Remove .env from git tracking (keeps local file)
+git rm --cached .env
+
+# Commit the removal
+git add .gitignore
+git commit -m "chore: remove .env from git tracking and add to .gitignore"
+
+# Push changes
+git push origin main
+```
+
+**⚠️ IMPORTANT**: If your credentials were already pushed to a remote repository:
+1. **Change your database password immediately**
+2. **Rotate any API keys or secrets** that were in the file
+3. Consider the exposed credentials as compromised
+
+For completely removing from git history (advanced):
+```bash
+# WARNING: This rewrites git history - coordinate with your team!
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch .env" \
+  --prune-empty --tag-name-filter cat -- --all
+
+# Force push (ONLY if you're sure and have coordinated with team)
+git push origin --force --all
 ```
 
 ## 🗄 Database Setup
@@ -251,6 +309,14 @@ Access control:
 
 ```
 ESGI-Budgie/
+├── .env.example             # Environment template (TRACKED - no secrets!)
+├── .env                     # Your actual config (IGNORED - has secrets!)
+├── .env.local               # Additional local overrides (IGNORED)
+├── .env.dev                 # Dev environment defaults (TRACKED - no secrets!)
+├── .gitignore               # Git ignore rules
+├── README.md                # This file
+├── composer.json            # PHP dependencies
+├── compose.yaml             # Docker Compose configuration
 ├── bin/
 │   └── console              # Symfony console commands
 ├── config/
@@ -290,13 +356,24 @@ ESGI-Budgie/
 │   │   └── ForecastProvider.php
 │   └── Kernel.php
 ├── templates/               # Twig templates
-├── var/                     # Cache, logs, sessions
-├── .env                     # Environment variables (template)
-├── .env.dev                 # Development environment
-├── composer.json            # PHP dependencies
-├── compose.yaml             # Docker Compose configuration
-└── symfony.lock             # Symfony Flex lock file
+├── var/                     # Cache, logs, sessions (IGNORED)
+└── vendor/                  # Dependencies (IGNORED)
 ```
+
+### 🔒 Git Ignore Configuration
+
+The `.gitignore` file ignores:
+- `/.env` - **Your actual credentials** (NEVER commit this!)
+- `/.env.local` - Additional local configuration
+- `/.env.local.php` - Compiled local environment
+- `/.env.*.local` - Any environment-specific local files
+- `/var/` - Cache, logs, sessions
+- `/vendor/` - Composer dependencies
+- `/public/bundles/` - Symfony bundles
+
+**Safe to commit:**
+- `.env.example` - Template with placeholder values
+- `.env.dev` - Dev environment defaults (no real credentials)
 
 ## 🔍 Core Entities
 
