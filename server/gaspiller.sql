@@ -1,0 +1,2 @@
+INSERT INTO user (email, roles, password, firstname, lastname, phone, fiscal_num, verified) VALUES
+('wilbour74@gmail.com', '["ROLE_USER"]', '$2y$13$YLmwGEZpA8PT3SIJSOmHzuPOhyJA15KZrYSyoGy/9wHcXr8dqHddm', 'Wilfried', 'Bourguignon', '0612345678', '1234567890', true);
