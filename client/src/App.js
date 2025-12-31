@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
-import NavBar from "./components/navBar/navBar.jsx";
+import NavBar from "./components/navBar/navBar";
 import Footer from "./components/footer/Footer";
 
 function App() {
