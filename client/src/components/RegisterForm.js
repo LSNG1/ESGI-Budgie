@@ -28,7 +28,7 @@ export default function RegisterForm() {
     const hashedPassword = await bcrypt.hash(form.password, salt);
     form.password = hashedPassword;
     console.log(form);
-    axios.post('http://localhost:8001/api/users', form,
+    axios.post('http://localhost:8000/api/users', form,
         {   
             headers: {
                 'Content-Type': 'application/ld+json'
