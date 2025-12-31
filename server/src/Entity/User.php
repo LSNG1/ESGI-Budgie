@@ -38,6 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['user:write', 'user:read'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -50,12 +51,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     #[ORM\Column(length: 30, nullable: true)]
+    #[Groups(['user:read','user:write'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['user:read','user:write'])]
     private ?string $fiscalNum = null;
 
     #[ORM\Column]
+    #[Groups(['user:read','user:write'])]
     private ?bool $verified = null;
 
     #[ORM\ManyToOne]
