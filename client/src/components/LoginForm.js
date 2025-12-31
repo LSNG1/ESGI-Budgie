@@ -1,9 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const { login } = useAuth();
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -13,7 +15,7 @@ export default function LoginForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    axios.post('http://localhost:8001/api/login', form,
+    axios.post('http://localhost:8000/api/login', form,
         {   
             headers: {
                 'Content-Type': 'application/ld+json'
@@ -21,6 +23,10 @@ export default function LoginForm() {
         })
         .then(response => {
             console.log("Login réussi :", response.data);
+            // Sauvegarder l'utilisateur dans le contexte
+            if (response.data.user) {
+              login(response.data.user);
+            }
             navigate("/home");
         })
         .catch(error => {
