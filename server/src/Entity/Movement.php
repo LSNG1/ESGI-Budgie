@@ -39,7 +39,7 @@ class Movement
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['movement:read'])]
+    #[Groups(['movement:read', 'movement:write'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 150)]

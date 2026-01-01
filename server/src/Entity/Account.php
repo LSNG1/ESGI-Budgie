@@ -57,7 +57,7 @@ class Account
     private ?string $overdraft = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    #[Groups(['account:read'])]
+    #[Groups(['account:read','account:write'])]
     private ?DateTimeImmutable $createdAt = null;
 
     /**

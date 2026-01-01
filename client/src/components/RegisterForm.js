@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -13,6 +14,8 @@ export default function RegisterForm() {
     fiscal_num: "",
     verified: false,
   });
+
+  const { login } = useAuth();
 
   const navigate = useNavigate();
 
@@ -28,7 +31,7 @@ export default function RegisterForm() {
     const hashedPassword = await bcrypt.hash(form.password, salt);
     form.password = hashedPassword;
     console.log(form);
-    axios.post('http://localhost:8000/api/users', form,
+    axios.post('http://localhost:8001/api/users', form,
         {   
             headers: {
                 'Content-Type': 'application/ld+json'
@@ -36,6 +39,19 @@ export default function RegisterForm() {
         })
         .then(response => {
             console.log("Utilisateur créé avec succès :", response.data);
+            if(response.data) {
+              const user = {
+                id: response.data.id,
+                firstname: response.data.firstname,
+                lastname: response.data.lastname,
+                email: response.data.email,
+                phone: response.data.phone,
+                fiscal_num: response.data.fiscal_num,
+                verified: response.data.verified
+              };
+
+              login(user);
+            }
             navigate("/home");
         })
         .catch(error => {
