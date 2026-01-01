@@ -61,7 +61,7 @@ export default function NavBar() {
                 </button>
               </div>
             ) : (
-              <Link to="/" className="hover:opacity-80 transition font-medium">
+              <Link to="/auth" className="hover:opacity-80 transition font-medium">
                 Se connecter
               </Link>
             )}
