@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import NavBar from "./components/navBar/navBar";
 import Footer from "./components/footer/Footer";
 import AccountPage from "./pages/AccountPage";
+import AccountEdit from "./pages/AccountEdit";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/home" element={<Home />} />
           <Route path="/account/:id" element={<AccountPage />} />
+          <Route path="/edit-account/:id" element={<AccountEdit />} />
         </Routes>
       </div>
       <Footer />
