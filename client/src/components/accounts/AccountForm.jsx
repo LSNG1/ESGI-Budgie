@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 
-export default function AccountForm({ onSuccess }) {
+export default function AccountForm({ onSuccess, accountId }) {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -19,6 +19,31 @@ export default function AccountForm({ onSuccess }) {
         createdAt: ""
     });
 
+    const formTitle = accountId ? "Modifier le compte" : "Créer un nouveau compte";
+
+    useEffect(() => {
+        if (!accountId) return;
+
+        axios.get(`http://localhost:8001/api/accounts/${accountId}`)
+            .then(res => {
+                const account = res.data;
+
+                setFormData({
+                    name: account.name || "",
+                    type: account.type || "",
+                    description: account.description || "",
+                    taxRate: account.taxRate ? account.taxRate * 100 : 0,
+                    rateOfPay: account.rateOfPay ? account.rateOfPay * 100 : 0,
+                    overdraft: account.overdraft || 0,
+                    userId: account.userId || user.id,
+                    createdAt: account.createdAt?.slice(0, 10) || ""
+                });
+            })
+            .catch(err => {
+                console.error("Erreur chargement compte:", err);
+            });
+    }, [accountId, user.id]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -31,15 +56,31 @@ export default function AccountForm({ onSuccess }) {
         const payload = {
             ...formData,
             taxRate: formData.taxRate
-                ? (Number(formData.taxRate) / 100)
+                ? (Number(formData.taxRate) / 100).toString
                 : "0",
             rateOfPay: formData.rateOfPay
-                ? (Number(formData.rateOfPay) / 100)
+                ? (Number(formData.rateOfPay) / 100).toString()
                 : "0"
         }
-
-        console.log(payload);
         e.preventDefault();
+        console.log(payload);
+        if (accountId) {
+            
+            axios.patch(`http://localhost:8001/api/accounts/${accountId}`, payload, {
+                headers: {
+                    'Content-Type': 'application/merge-patch+json'
+                }
+            })
+                .then(response => {
+                    console.log("Compte mis à jour avec succès :", response.data);
+                    navigate('/home');
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la mise à jour du compte :", error);
+                });
+            return;
+        }
+    
         axios.post("http://localhost:8001/account", payload, {
             headers: {
                 'Content-Type': 'application/ld+json'
@@ -56,7 +97,7 @@ export default function AccountForm({ onSuccess }) {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4">Créer un nouveau compte</h2>
+            <h2 className="text-2xl font-bold mb-4">{formTitle}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     type="text"
@@ -122,7 +163,7 @@ export default function AccountForm({ onSuccess }) {
                     type="submit"
                     className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
                 >
-                    Créer le compte
+                    {accountId ? "Mettre à jour le compte" : "Créer le compte"}
                 </button>
             </form>
         </div>

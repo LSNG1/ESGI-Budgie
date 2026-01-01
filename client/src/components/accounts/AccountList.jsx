@@ -52,7 +52,7 @@ export default function AccountList() {
                                 Voir
                             </button>
 
-                            <button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg">
+                            <button onClick={() => navigate(`/edit-account/${item.account.id}`)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg">
                                 Gérer
                             </button>
                         </div>
