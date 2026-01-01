@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 
-export default function AccountForm() {
+export default function AccountForm({ onSuccess }) {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -47,7 +47,7 @@ export default function AccountForm() {
         })
             .then(response => {
                 console.log("Compte créé avec succès :", response.data);
-                navigate("/");
+                onSuccess();
             })
             .catch(error => {
                 console.error("Erreur lors de la création du compte :", error);

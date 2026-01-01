@@ -23,4 +23,12 @@ export default function AccountPage() {
   useEffect(() => {
     fetchAccount();
   }, [id]);
-q
+
+  return(
+    <div className="h-full flex flex-col items-center justify-start overflow-auto p-4 space-y-6">
+      <h1 className="text-4xl font-bold">Compte: {account.name}</h1>
+      <MovementForm accountId={id} onMovementAdded={fetchAccount} />
+      <MovementList accountId={id} />
+    </div>
+  );
+}
