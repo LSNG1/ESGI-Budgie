@@ -50,7 +50,7 @@ export default function MovementList({ movements, accountId }) {
             type: movement.type,
             description: movement.description,
             frequencyType: movement.frequencyType,
-            frequencyN: movement.frequencyN
+            frequencyN: movement.frequencyN ? parseInt(movement.frequencyN, 10) : 0
         });
     };
 
@@ -64,12 +64,13 @@ export default function MovementList({ movements, accountId }) {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: name === "frequencyN" ? parseInt(value, 10) || 0 : value
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(formData);
         try {
             const response = await axios.patch(
                 `http://localhost:8001/api/movements/${editingMovement.id}`,
@@ -128,7 +129,6 @@ export default function MovementList({ movements, accountId }) {
                 </ul>
             )}
 
-            {/* Modal de modification */}
             {editingMovement && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
                     <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
