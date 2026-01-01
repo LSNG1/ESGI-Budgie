@@ -5,7 +5,22 @@ namespace App\Entity;
 use App\Repository\UserAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
+use Symfony\Component\Serializer\Annotation\Groups;
+
 #[ORM\Entity(repositoryClass: UserAccountRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Patch(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['user_account:read']],
+    denormalizationContext: ['groups' => ['user_account:write']]
+)]
 class UserAccount
 {
     #[ORM\Id]
@@ -15,13 +30,16 @@ class UserAccount
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['user_account:read','user_account:write'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['user_account:read','user_account:write'])]
     private ?Account $account = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['user_account:read','user_account:write'])]
     private ?string $role = null;
 
     #[ORM\Column]
