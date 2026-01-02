@@ -5,6 +5,7 @@ import axios from "axios";
 import MovementForm from "../components/accounts/MovementForm";
 import MovementList from "../components/accounts/MovementList";
 import Forecast from "../components/forecast/Forecast";
+import Transaction from "../components/transaction/Transaction";
 
 export default function AccountPage() {
   const { id } = useParams();
@@ -46,6 +47,9 @@ export default function AccountPage() {
       <h1 className="text-4xl font-bold">Compte: {account.name}</h1>
       <MovementForm accountId={id} onSuccess={fetchMovements} />
       <MovementList movements={movements} accountId={id} />
+      <div className="w-full max-w-6xl">
+        <Transaction accountId={id} />
+      </div>
       <div className="w-full max-w-6xl">
         <Forecast accountId={id} />
       </div>
