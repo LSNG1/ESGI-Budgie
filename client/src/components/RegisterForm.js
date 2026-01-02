@@ -23,7 +23,7 @@ export default function RegisterForm({ userId }) {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8001/api/users/${userId}`)
+      axios.get(`http://localhost:8000/api/users/${userId}`)
         .then(response => {
           const user = response.data;
           setForm(prev => ({
@@ -107,13 +107,13 @@ export default function RegisterForm({ userId }) {
 
       if (userId) {
         await axios.patch(
-          `http://localhost:8001/api/users/${userId}`,
+          `http://localhost:8000/api/users/${userId}`,
           formData,
           { headers: { 'Content-Type': 'application/merge-patch+json' } }
         );
       } else {
         const response = await axios.post(
-          'http://localhost:8001/api/users',
+          'http://localhost:8000/api/users',
           formData,
           { headers: { 'Content-Type': 'application/ld+json' } }
         );

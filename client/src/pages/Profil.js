@@ -16,7 +16,7 @@ export default function Profil() {
         if (!isConfirmed) return;
 
         try {
-            await axios.delete(`http://localhost:8001/user/${user.id}`, {
+            await axios.delete(`http://localhost:8000/user/${user.id}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },

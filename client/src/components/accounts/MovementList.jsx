@@ -34,7 +34,7 @@ export default function MovementList({ movements, accountId }) {
 
     const deleteMovement = async (movementId) => {
         try {
-            await axios.delete(`http://localhost:8001/api/movements/${movementId}`);
+            await axios.delete(`http://localhost:8000/api/movements/${movementId}`);
             setMovementList(prevList => prevList.filter(m => m.id !== movementId));
         } catch (error) {
             console.error("Erreur lors de la suppression du mouvement :", error);
@@ -73,7 +73,7 @@ export default function MovementList({ movements, accountId }) {
         console.log(formData);
         try {
             const response = await axios.patch(
-                `http://localhost:8001/api/movements/${editingMovement.id}`,
+                `http://localhost:8000/api/movements/${editingMovement.id}`,
                 formData,{
                     headers: {
                         'Content-Type': 'application/merge-patch+json'

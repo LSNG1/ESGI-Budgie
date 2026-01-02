@@ -13,7 +13,7 @@ export default function AccountPage() {
 
   const fetchAccount = async () => {
     try {
-      const response = await axios.get(`http://localhost:8001/api/accounts/${id}`);
+      const response = await axios.get(`http://localhost:8000/api/accounts/${id}`);
       setAccount(response.data);
       console.log(response.data)
     } catch (error) {
@@ -23,7 +23,7 @@ export default function AccountPage() {
 
   const fetchMovements = async () => {
     try {
-      const response = await axios.get(`http://localhost:8001/account/movements/${account.id}`);
+      const response = await axios.get(`http://localhost:8000/account/movements/${account.id}`);
       console.log("Movements API Response:", response.data);
       setMovements(response.data.movements || []);
     } catch (err) {

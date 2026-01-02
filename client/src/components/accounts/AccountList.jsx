@@ -14,7 +14,7 @@ export default function AccountList() {
 
     const fetchAccounts = async () => {
         try {
-            const response = await axios.get(`http://localhost:8001/user-account/${user.id}`);
+            const response = await axios.get(`http://localhost:8000/user-account/${user.id}`);
             console.log("API Response:", response.data);
 
             setAccounts(response.data.accounts || []);

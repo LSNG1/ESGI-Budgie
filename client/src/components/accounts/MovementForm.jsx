@@ -40,7 +40,7 @@ const handleSubmit = async (e) => {
     };
     console.log(formData);
     console.log(user.id);
-    axios.post("http://localhost:8001/api/movements", payload, {
+    axios.post("http://localhost:8000/api/movements", payload, {
         headers: {
             'Content-Type': 'application/ld+json'
         }

@@ -24,7 +24,7 @@ export default function AccountForm({ onSuccess, accountId }) {
     useEffect(() => {
         if (!accountId) return;
 
-        axios.get(`http://localhost:8001/api/accounts/${accountId}`)
+        axios.get(`http://localhost:8000/api/accounts/${accountId}`)
             .then(res => {
                 const account = res.data;
 
@@ -66,7 +66,7 @@ export default function AccountForm({ onSuccess, accountId }) {
         console.log(payload);
         if (accountId) {
             
-            axios.patch(`http://localhost:8001/api/accounts/${accountId}`, payload, {
+            axios.patch(`http://localhost:8000/api/accounts/${accountId}`, payload, {
                 headers: {
                     'Content-Type': 'application/merge-patch+json'
                 }
@@ -81,7 +81,7 @@ export default function AccountForm({ onSuccess, accountId }) {
             return;
         }
     
-        axios.post("http://localhost:8001/account", payload, {
+        axios.post("http://localhost:8000/account", payload, {
             headers: {
                 'Content-Type': 'application/ld+json'
             }
