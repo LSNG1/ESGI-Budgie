@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
-export default function MovementForm({accountId}) {
+export default function MovementForm({accountId, onSuccess}) {
 
 
   const { user } = useAuth();
@@ -40,13 +40,14 @@ const handleSubmit = async (e) => {
     };
     console.log(formData);
     console.log(user.id);
-    axios.post("http://localhost:8001/api/movements", payload, {
+    axios.post("http://localhost:8000/api/movements", payload, {
         headers: {
             'Content-Type': 'application/ld+json'
         }
     })
     .then(response => {
         console.log("Mouvement ajouté avec succès :", response.data);
+        onSuccess();
         // Réinitialiser le formulaire ou afficher un message de succès si nécessaire
     })
     .catch(error => {

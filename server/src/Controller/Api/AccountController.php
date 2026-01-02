@@ -142,4 +142,58 @@ class AccountController extends AbstractController
             'movements' => $movementData
         ]);
     }
+
+    #[Route('/account/{accountId}', name: 'delete_account', methods: ['DELETE'])]
+    public function deleteAccount(
+        int $accountId,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        if ($accountId <= 0) {
+            return $this->json([
+                'error' => 'ID de compte invalide'
+            ], 400);
+        }
+
+        try {
+            $account = $em->getRepository(Account::class)->find($accountId);
+
+            if (!$account) {
+                return $this->json([
+                    'error' => 'Compte introuvable'
+                ], 404);
+            }
+
+            $userAccount = $em->getRepository(UserAccount::class)
+                ->findOneBy(['account' => $account]);
+
+            if (!$userAccount) {
+                return $this->json([
+                    'error' => 'Relation utilisateur-compte introuvable'
+                ], 409);
+            }
+
+            $movements = $em->getRepository(Movement::class)
+                ->findBy(['account' => $account]);
+            foreach ($movements as $movement) {
+                $em->remove($movement);
+            }
+            $em->remove($userAccount);
+            $em->remove($account);
+            
+            $em->flush();
+
+            return $this->json([
+                'message' => 'Compte supprimé avec succès'
+            ], 200);
+        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
+            return $this->json([
+                'error' => 'Impossible de supprimer ce compte : dépendances existantes'
+            ], 409);
+        } catch (\Throwable $e) {
+            return $this->json([
+                'error' => 'Erreur interne du serveur',
+                'details' => $e->getMessage() // enlève en prod
+            ], 500);
+        }
+    }
 }

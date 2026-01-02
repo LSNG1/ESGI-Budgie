@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -16,6 +17,12 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
 )]
+
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'This email address is already registered.'
+)]
+
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -26,8 +33,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:read','user:write'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
+
 
     /**
      * @var list<string> The user roles
@@ -43,23 +51,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['user:read','user:write'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['user:read','user:write'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 30, nullable: true)]
-    #[Groups(['user:read','user:write'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['user:read','user:write'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $fiscalNum = null;
 
     #[ORM\Column]
-    #[Groups(['user:read','user:write'])]
+    #[Groups(['user:read', 'user:write'])]
     private ?bool $verified = null;
 
     #[ORM\ManyToOne]
@@ -135,7 +143,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
 
         return $data;
     }

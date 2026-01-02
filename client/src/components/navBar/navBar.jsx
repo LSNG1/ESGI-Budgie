@@ -53,7 +53,7 @@ export default function NavBar() {
             {/* Affichage conditionnel : nom de l'utilisateur ou "Se connecter" */}
             {user ? (
               <div className="flex items-center gap-4">
-                <Link to="/compte" className="hover:opacity-80 transition font-medium">
+                <Link to="/profil" className="hover:opacity-80 transition font-medium">
                     <span className="font-medium">{getUserDisplayName()}</span>
                 </Link>
                 <button onClick={handleLogout} className="hover:opacity-80 transition font-medium">
