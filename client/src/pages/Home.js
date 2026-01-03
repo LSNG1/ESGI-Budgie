@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AccountList from "../components/accounts/AccountList";
 import AccountForm from "../components/accounts/AccountForm";
+import RecentTransactions from "../components/transaction/RecentTransactions";
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,8 +13,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-full flex flex-col items-center justify-start p-6 space-y-6">
-
+    <div className="h-full flex flex-col items-center justify-start p-6 space-y-6 overflow-auto">
       <button
         onClick={() => setIsOpen(true)}
         className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition"
@@ -21,10 +21,13 @@ export default function Home() {
         ➕ Nouveau compte
       </button>
 
+      {/* Mini tableau des dernières transactions */}
+      <RecentTransactions limit={10} />
+
       <AccountList key={refreshKey} />
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
 
             <button
