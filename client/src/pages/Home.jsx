@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AccountList from "../components/accounts/AccountList";
 import AccountForm from "../components/accounts/AccountForm";
 import RecentTransactions from "../components/transaction/RecentTransactions";
+import Dashboard from "../components/dashboard/Dashboard";
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,17 +15,24 @@ export default function Home() {
 
   return (
     <div className="h-full flex flex-col items-center justify-start p-6 space-y-6 overflow-auto">
-      <button
-        onClick={() => setIsOpen(true)}
-        className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-      >
-        ➕ Nouveau compte
-      </button>
+      <div className="mt-10 flex flex-row justify-between items-start w-11/12">
+        {/* Mini tableau des dernières transactions */}
+        <RecentTransactions limit={5} />
+        <div>
+          <div className="relative flex items-end justify-between px-6">
+            <h1 className="text-2xl font-bold">Mes Comptes</h1>
+            <button onClick={() => setIsOpen(true)} className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition">
+              + Nouveau compte
+            </button>
+          </div>
+          <AccountList key={refreshKey} />
+        </div>
+      </div>
+      {/* Dashboard avec métriques et graphique */}
+      <div className="w-full w-11/12">
+        <Dashboard />
+      </div>
 
-      {/* Mini tableau des dernières transactions */}
-      <RecentTransactions limit={10} />
-
-      <AccountList key={refreshKey} />
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

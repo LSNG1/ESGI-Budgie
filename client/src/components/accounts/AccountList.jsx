@@ -35,31 +35,27 @@ export default function AccountList() {
     if (loading) return <div>Loading...</div>;
     
     return (
-        <div className="p-6 max-w-xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4 text-center">Mes Comptes</h1>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-                {accounts.map((item) => (
-                    <div
-                        key={item.account.id}
-                        className="bg-white p-4 rounded-xl shadow"
-                    >
-                        <h2 className="font-semibold">{item.account.name}</h2>
-                        <p className="text-sm text-gray-500">Type: {item.account.type}</p>
-
-                        <div className="mt-4 flex gap-2">
-                            <button onClick={() => navigate(`/account/${item.account.id}`)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
-                                Voir
-                            </button>
-
-                            <button onClick={() => navigate(`/edit-account/${item.account.id}`)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg">
-                                Gérer
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+        <div className="p-6 max-w-full mx-auto">
+          <div className="flex flex-row flex-wrap gap-4 overflow-x-auto md:overflow-x-visible">
+            {accounts.map((item) => (
+              <div key={item.account.id} className="flex-none bg-white rounded-xl shadow-md w-36 aspect-square overflow-hidden">
+                <div className="p-4 h-full flex flex-col justify-between">
+                  <div>
+                    <h2 className="font-semibold">{item.account.name}</h2>
+                    <p className="text-sm text-gray-500">Type: {item.account.type}</p>
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <button onClick={() => navigate(`/account/${item.account.id}`)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+                      Voir
+                    </button>
+                    <button onClick={() => navigate(`/edit-account/${item.account.id}`)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg">
+                      Gérer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-    );
-
+      );
 }
