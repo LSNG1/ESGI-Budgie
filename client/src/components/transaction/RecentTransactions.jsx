@@ -171,7 +171,7 @@ export default function RecentTransactions({ limit = 10 }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 w-full max-w-4xl">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 w-full max-w-xl">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-gray-800">Dernières transactions</h2>
         <button
@@ -189,16 +189,13 @@ export default function RecentTransactions({ limit = 10 }) {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">
+                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 w-1/3">
                   Date
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">
-                  Compte
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">
+                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 w-1/3">
                   Description
                 </th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700">
+                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700 w-1/6">
                   Montant
                 </th>
               </tr>
@@ -215,9 +212,6 @@ export default function RecentTransactions({ limit = 10 }) {
                   <td className="px-4 py-2 text-sm text-gray-800/60">
                     {formatDate(transaction.date)}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {transaction.accountName}
-                  </td>
                   <td className="px-4 py-2 text-sm">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-gray-800">
@@ -225,7 +219,7 @@ export default function RecentTransactions({ limit = 10 }) {
                       </span>
                       {transaction.isRecurring && (
                         <span className="px-1.5 py-0.5 bg-blue-100/50 text-blue-700/50 text-xs rounded">
-                          Récurrent
+                          {transaction.accountName}
                         </span>
                       )}
                     </div>
