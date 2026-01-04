@@ -7,7 +7,7 @@ export default function LandingPage() {
         {/* Hero Section */}
         <div className="text-center mb-16 mt-16">
           <h1 className="text-5xl md:text-6xl font-bold text-black mb-6">
-            Bienvenue sur <span className="text-[#005f73]">Budgie</span>
+            Bienvenue sur <span className="text-[#0353a4]">Budgie</span>
           </h1>
           <p className="text-xl md:text-2xl text-black mb-8 max-w-2xl mx-auto">
             Gestionnez vos finances en toute simplicité. Suivez vos comptes, prévoyez vos dépenses et prenez le contrôle de votre budget.
@@ -15,7 +15,7 @@ export default function LandingPage() {
           <div className="flex gap-4 justify-center">
             <Link
               to="/auth"
-              className="bg-[#005f73] text-white px-8 py-3 rounded-lg font-semibold hover:opacity-70 transition shadow-lg"
+              className="bg-[#0353a4] text-white px-8 py-3 rounded-lg font-semibold hover:opacity-70 transition shadow-lg"
             >
               Commencer maintenant
             </Link>
@@ -32,7 +32,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="bg-[#005f73]/40 backdrop-blur-sm rounded-xl p-6 text-black shadow-[0_0_15px_rgba(0,0,0,0.30)]">
+          <div className="bg-[#0353a4]/40 backdrop-blur-sm rounded-xl p-6 text-black shadow-[0_0_15px_rgba(0,0,0,0.30)]">
             <div className="text-4xl mb-4">📊</div>
             <h3 className="text-xl font-bold mb-2">Prévisions intelligentes</h3>
             <p className="text-black/80">
@@ -60,7 +60,7 @@ export default function LandingPage() {
               <p className="text-gray-600 mb-4">
                 Visualisez d'un coup d'œil tous vos comptes avec leurs soldes actuels. Le solde total de tous vos comptes est calculé automatiquement.
               </p>
-              <div className="bg-[#005f73] rounded-lg p-4 text-white">
+              <div className="bg-[#0353a4] rounded-lg p-4 text-white">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Solde Total</span>
                   <span className="text-2xl font-bold">12 450,00 €</span>
@@ -88,7 +88,7 @@ export default function LandingPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center bg-[#005f73] backdrop-blur-sm rounded-xl p-8">
+        <div className="text-center bg-[#0353a4] backdrop-blur-sm rounded-xl p-8">
           <h2 className="text-3xl font-bold text-white mb-4">
             Prêt à prendre le contrôle de vos finances ?
           </h2>
@@ -97,7 +97,7 @@ export default function LandingPage() {
           </p>
           <Link
             to="/auth"
-            className="inline-block bg-white text-[#005f73] px-8 py-3 rounded-lg font-semibold hover:bg-cyan-50 transition shadow-lg"
+            className="inline-block bg-white text-[#0353a4] px-8 py-3 rounded-lg font-semibold hover:bg-cyan-50 transition shadow-lg"
           >
             Créer mon compte gratuitement
           </Link>
