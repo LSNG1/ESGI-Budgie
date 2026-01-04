@@ -176,12 +176,12 @@ export default function Transaction({ accountId }) {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+    <div className="bg-white h-full rounded-lg shadow-md border border-gray-200 p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Historique des transactions</h2>
+        <h2 className="text-2lg font-bold text-gray-800">Historique des transactions</h2>
         <button
           onClick={fetchTransactions}
-          className="px-4 py-2 bg-[#005f73] hover:bg-[#0a9396] text-white rounded-lg font-semibold transition"
+          className="px-4 py-2 bg-[#0353a4] hover:bg-[#0a9396] text-white rounded-lg font-semibold transition"
         >
           Actualiser
         </button>
@@ -206,7 +206,7 @@ export default function Transaction({ accountId }) {
       )}
 
       {transactions.length > 0 && !loading && (
-        <div className="space-y-6">
+        <div className="max-h-[500px] overflow-y-auto space-y-6">
           {Object.keys(transactionsByMonth)
             .sort()
             .reverse()
@@ -228,12 +228,6 @@ export default function Transaction({ accountId }) {
                         })}
                       </h3>
                       <div className="flex gap-4 text-sm">
-                        <span className="text-green-600 font-medium">
-                          Revenus: {formatCurrency(totals.incomes)}
-                        </span>
-                        <span className="text-red-600 font-medium">
-                          Dépenses: {formatCurrency(totals.expenses)}
-                        </span>
                         <span
                           className={`font-semibold ${
                             totals.incomes - totals.expenses >= 0

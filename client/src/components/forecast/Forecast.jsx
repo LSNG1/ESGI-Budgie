@@ -81,7 +81,7 @@ export default function Forecast({ accountId }) {
             type="date"
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:border-[#005f73] focus:ring-1 focus:ring-[#005f73] outline-none"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0353a4] focus:ring-1 focus:ring-[#0353a4] outline-none"
           />
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function Forecast({ accountId }) {
       {forecastData && !loading && (
         <>
           {/* Résumé du solde final */}
-          <div className="mb-6 p-4 bg-gradient-to-r from-[#005f73] to-[#0a9396] rounded-lg text-white">
+          <div className="mb-6 p-4 bg-gradient-to-r from-[#0353a4] to-[#0a9396] rounded-lg text-white">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm opacity-90">Solde prévu au</p>
@@ -127,7 +127,7 @@ export default function Forecast({ accountId }) {
           </div>
 
           {/* Tableau des prévisions mensuelles */}
-          <div className="overflow-x-auto">
+          <div className="max-h-[400px] overflow-y-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b-2 border-gray-200">

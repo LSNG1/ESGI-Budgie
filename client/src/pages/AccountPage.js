@@ -45,13 +45,21 @@ export default function AccountPage() {
   return (
     <div className="h-full flex flex-col items-center justify-start overflow-auto p-4 space-y-6">
       <h1 className="text-4xl font-bold">Compte: {account.name}</h1>
-      <MovementForm accountId={id} onSuccess={fetchMovements} />
-      <MovementList movements={movements} accountId={id} />
-      <div className="w-full max-w-6xl">
-        <Transaction accountId={id} />
+      <div className="flex flex-row w-11/12 justify-between gap-4">
+        <div className="h-full w-1/3">
+          <MovementForm accountId={id} onSuccess={fetchMovements} />
+        </div>
+        <div className="h-full w-2/3">
+          <MovementList movements={movements} accountId={id} />
+        </div>
       </div>
-      <div className="w-full max-w-6xl">
-        <Forecast accountId={id} />
+      <div className="flex flex-row h-500 gap-4 w-11/12 justify-between">
+        <div className="h-full w-1/3">
+          <Transaction accountId={id} />
+        </div>
+        <div className="h-full w-2/3">
+          <Forecast accountId={id} />
+        </div>
       </div>
     </div>
   );

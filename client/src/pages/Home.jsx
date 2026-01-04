@@ -29,7 +29,7 @@ export default function Home() {
         </div>
       </div>
       {/* Dashboard avec métriques et graphique */}
-      <div className="w-full w-11/12">
+      <div className="w-11/12">
         <Dashboard />
       </div>
 

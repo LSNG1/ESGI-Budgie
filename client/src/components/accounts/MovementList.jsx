@@ -94,23 +94,24 @@ export default function MovementList({ movements, accountId }) {
 
     return (
         <div>
-            <h2 className="text-xl font-bold mb-4">Mouvements</h2>
+            {/* <h2 className="text-xl font-bold mb-4">Mouvements</h2> */}
             {movementList.length === 0 ? (
                 <p>Aucun mouvement trouvé pour ce compte.</p>
             ) : (
-                <ul className="space-y-4">
+                <ul className="space-y-4 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] max-h-[350px] overflow-y-auto p-6">
                     {movementList.map((movement) => (
-                        <li key={movement.id} className="bg-white p-4 rounded-lg shadow">
-                            <h3 className="font-semibold">{movement.name}</h3>
-                            {movement.type === "income" ? (
-                                <p className="text-sm text-green-500">Type: Revenu</p>
-                            ) : (
-                                <p className="text-sm text-red-500">Type: Dépense</p>
-                            )}
-                            <p className="text-sm text-gray-500">Montant: {movement.amount}</p>
-                            <p className="text-sm text-gray-500">Description: {movement.description}</p>
+                        <li key={movement.id} className="bg-white hover:bg-gray-100 flex flex-row justify-between p-2 border-b border-gray-300">
+                            <div className="flex flex-row gap-5 items-center">
+                                <h3 className="font-semibold">{movement.name}</h3>
+                                {movement.type === "income" ? (
+                                    <p className="text-sm text-green-500">Type: Revenu</p>
+                                ) : (
+                                    <p className="text-sm text-red-500">Type: Dépense</p>
+                                )}
+                                <p className="text-sm text-black">Montant: {movement.amount} €</p>
+                            </div>
 
-                            <div className="mt-2 flex gap-2">
+                            <div className="flex gap-2">
                                 <button
                                     onClick={() => deleteMovement(movement.id)}
                                     className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg"
