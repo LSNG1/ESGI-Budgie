@@ -25,9 +25,14 @@ export default function AccountPage() {
 
   const fetchMovements = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/account/movements/${account.id}`);
+      const response = await axios.get(`http://localhost:8000/api/movements`, {
+        params: {
+          account: `/api/accounts/${account.id}`
+        }
+      });
       console.log("Movements API Response:", response.data);
-      setMovements(response.data.movements || []);
+      const members = response.data["hydra:member"] || response.data.member || [];
+      setMovements(members);
     } catch (err) {
       console.error(err);
     }

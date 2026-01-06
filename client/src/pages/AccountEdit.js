@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import React from "react";
-import { useEffect, useState } from "react";
 import axios from "axios";
 import AccountForm from "../components/accounts/AccountForm";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +16,7 @@ export default function AccountEdit() {
         if (!isConfirmed) return;
 
         try {
-            await axios.delete(`http://localhost:8000/account/${id}`, {
+            await axios.delete(`http://localhost:8000/api/accounts/${id}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },

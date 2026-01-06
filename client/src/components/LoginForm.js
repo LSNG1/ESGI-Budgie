@@ -16,16 +16,15 @@ export default function LoginForm() {
   function handleSubmit(e) {
     e.preventDefault();
     axios.post('http://localhost:8000/api/login', form,
-        {   
+        {
             headers: {
-                'Content-Type': 'application/ld+json'
+                'Content-Type': 'application/json'
             }
         })
-        .then(response => {
-            console.log("Login réussi :", response.data);
-            // Sauvegarder l'utilisateur dans le contexte
-            if (response.data.user) {
-              login(response.data.user);
+        .then(async () => {
+            const me = await axios.get('http://localhost:8000/api/me');
+            if (me.data) {
+              login(me.data);
             }
             navigate("/home");
         })

@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import React from "react";
-import { useAuth } from "../../context/AuthContext";
-
 export default function MovementList({ movements, accountId }) {
-    const { user } = useAuth();
-    const accountIdPath = `/api/accounts/${accountId}`;
-    const userId = `/api/users/${user.id}`;
     const [movementList, setMovementList] = useState([]);
     const [editingMovement, setEditingMovement] = useState(null);
 
@@ -14,9 +9,6 @@ export default function MovementList({ movements, accountId }) {
         name: "",
         amount: "",
         type: "",
-        description: "",
-        user: userId,
-        account: accountIdPath,
         description: "",
         startDate: null,
         endDate: null,

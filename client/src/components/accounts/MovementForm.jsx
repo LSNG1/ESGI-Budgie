@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
 export default function MovementForm({accountId, onSuccess}) {
 
 
-  const { user } = useAuth();
   let account = `/api/accounts/${accountId}`;
   const [formData, setFormData] = useState({
     account: account,
@@ -15,9 +13,7 @@ export default function MovementForm({accountId, onSuccess}) {
     frequencyType: "",
     frequencyN: 0,
     startDate: null,
-    endDate: null,
-    user: `/api/users/${user.id}`, // À remplacer par l'ID de l'utilisateur connecté
-
+    endDate: null
 });
 
 
@@ -39,7 +35,6 @@ const handleSubmit = async (e) => {
 
     };
     console.log(formData);
-    console.log(user.id);
     axios.post("http://localhost:8000/api/movements", payload, {
         headers: {
             'Content-Type': 'application/ld+json'

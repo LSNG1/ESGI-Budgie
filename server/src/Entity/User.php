@@ -3,17 +3,42 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\{Delete, Get, Patch, Post};
 use App\Repository\UserRepository;
+use App\State\CurrentUserProvider;
+use App\State\UserDeleteProcessor;
+use App\State\UserPasswordHasherProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
+    operations: [
+        new Post(
+            processor: UserPasswordHasherProcessor::class
+        ),
+        new Get(
+            security: 'is_granted("ROLE_USER") and object == user'
+        ),
+        new Patch(
+            security: 'is_granted("ROLE_USER") and object == user',
+            processor: UserPasswordHasherProcessor::class
+        ),
+        new Delete(
+            security: 'is_granted("ROLE_USER") and object == user',
+            processor: UserDeleteProcessor::class
+        ),
+        new Get(
+            uriTemplate: '/me',
+            provider: CurrentUserProvider::class,
+            security: 'is_granted("ROLE_USER")',
+            normalizationContext: ['groups' => ['user:read']]
+        )
+    ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
 )]
@@ -47,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(['user:write', 'user:read'])]
+    #[Groups(['user:write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -67,7 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $fiscalNum = null;
 
     #[ORM\Column]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read'])]
     private ?bool $verified = null;
 
     #[ORM\ManyToOne]

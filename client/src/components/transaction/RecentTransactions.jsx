@@ -24,9 +24,9 @@ export default function RecentTransactions({ limit = 10 }) {
 
     try {
       // Récupérer tous les comptes de l'utilisateur
-      const accountsResponse = await axios.get(`http://localhost:8000/user-account/${user.id}`);
-      const userAccounts = accountsResponse.data.accounts || [];
-      const accountIds = userAccounts.map((ua) => ua.account.id.toString());
+      const accountsResponse = await axios.get(`http://localhost:8000/api/accounts`);
+      const accounts = accountsResponse.data["hydra:member"] || accountsResponse.data.member || [];
+      const accountIds = accounts.map((account) => account.id.toString());
 
       if (accountIds.length === 0) {
         setTransactions([]);
@@ -65,9 +65,9 @@ export default function RecentTransactions({ limit = 10 }) {
           // Ajouter l'ID du compte à chaque occurrence
           occurrences.forEach((occ) => {
             occ.accountId = movementAccountId;
-            occ.accountName = userAccounts.find(
-              (ua) => ua.account.id.toString() === movementAccountId
-            )?.account.name || "Compte";
+            occ.accountName = accounts.find(
+              (account) => account.id.toString() === movementAccountId
+            )?.name || "Compte";
           });
           allTransactions.push(...occurrences);
         }

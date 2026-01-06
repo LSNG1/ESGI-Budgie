@@ -4,20 +4,35 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\MovementExceptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: MovementExceptionRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'movement' => 'exact'
+])]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Get(
+            security: 'is_granted("ACCOUNT_VIEW", object.getMovement().getAccount())'
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Post(
+            securityPostDenormalize: 'is_granted("ACCOUNT_EDIT", object.getMovement().getAccount())'
+        ),
+        new Patch(
+            security: 'is_granted("ACCOUNT_EDIT", object.getMovement().getAccount())'
+        ),
+        new Delete(
+            security: 'is_granted("ACCOUNT_EDIT", object.getMovement().getAccount())'
+        )
     ],
     normalizationContext: ['groups' => ['exception:read']],
     denormalizationContext: ['groups' => ['exception:write']]

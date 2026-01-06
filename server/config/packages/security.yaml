@@ -19,14 +19,18 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            entry_point: form_login
+            json_login:
+                check_path: /api/login
+                username_path: email
+                password_path: password
+            logout:
+                path: /api/logout
+            # Optional: keep form login for Twig pages
             form_login:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
-            logout:
-                path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -37,12 +41,9 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/users, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/user_accounts, roles: PUBLIC_ACCESS }
-        - { path: ^/api/movements, roles: PUBLIC_ACCESS }
-        - { path: ^/api/accounts, roles: PUBLIC_ACCESS }
-        - { path: ^/account, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/api/users, roles: PUBLIC_ACCESS, methods: [POST] }
         - { path: ^/api, roles: ROLE_USER }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
@@ -57,3 +58,5 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+
+

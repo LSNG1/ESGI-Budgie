@@ -19,8 +19,12 @@ export default function Transaction({ accountId }) {
     setError(null);
 
     try {
-      // Récupérer toutes les transactions
-      const response = await axios.get("http://localhost:8000/api/movements");
+      // Récupérer toutes les transactions du compte
+      const response = await axios.get("http://localhost:8000/api/movements", {
+        params: {
+          account: `/api/accounts/${accountId}`
+        }
+      });
 
       // Traiter les transactions pour générer toutes les occurrences
       const allTransactions = [];

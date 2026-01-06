@@ -22,9 +22,9 @@ export default function Dashboard() {
 
     try {
       // Récupérer tous les comptes de l'utilisateur
-      const accountsResponse = await axios.get(`http://localhost:8000/user-account/${user.id}`);
-      const userAccounts = accountsResponse.data.accounts || [];
-      const accountIds = userAccounts.map((ua) => ua.account.id.toString());
+      const accountsResponse = await axios.get(`http://localhost:8000/api/accounts`);
+      const accounts = accountsResponse.data["hydra:member"] || accountsResponse.data.member || [];
+      const accountIds = accounts.map((account) => account.id.toString());
 
       if (accountIds.length === 0) {
         setTransactions([]);

@@ -3,10 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "../../context/AuthContext";
-
 export default function AccountForm({ onSuccess, accountId }) {
-    const { user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
@@ -15,7 +12,6 @@ export default function AccountForm({ onSuccess, accountId }) {
         taxRate: 0,
         rateOfPay: 0,
         overdraft: 0,
-        userId: user.id,
         createdAt: ""
     });
 
@@ -35,14 +31,13 @@ export default function AccountForm({ onSuccess, accountId }) {
                     taxRate: account.taxRate ? account.taxRate * 100 : 0,
                     rateOfPay: account.rateOfPay ? account.rateOfPay * 100 : 0,
                     overdraft: account.overdraft || 0,
-                    userId: account.userId || user.id,
                     createdAt: account.createdAt?.slice(0, 10) || ""
                 });
             })
             .catch(err => {
                 console.error("Erreur chargement compte:", err);
             });
-    }, [accountId, user.id]);
+    }, [accountId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -56,11 +51,14 @@ export default function AccountForm({ onSuccess, accountId }) {
         const payload = {
             ...formData,
             taxRate: formData.taxRate
-                ? (Number(formData.taxRate) / 100).toString
+                ? (Number(formData.taxRate) / 100).toString()
                 : "0",
             rateOfPay: formData.rateOfPay
                 ? (Number(formData.rateOfPay) / 100).toString()
                 : "0"
+        }
+        if (!payload.createdAt) {
+            delete payload.createdAt;
         }
         e.preventDefault();
         console.log(payload);
@@ -81,7 +79,7 @@ export default function AccountForm({ onSuccess, accountId }) {
             return;
         }
     
-        axios.post("http://localhost:8000/account", payload, {
+        axios.post("http://localhost:8000/api/accounts", payload, {
             headers: {
                 'Content-Type': 'application/ld+json'
             }

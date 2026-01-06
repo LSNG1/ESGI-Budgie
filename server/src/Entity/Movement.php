@@ -4,22 +4,42 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\MovementRepository;
+use App\State\MovementCreateProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: MovementRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'account' => 'exact',
+    'type' => 'exact',
+    'name' => 'partial',
+    'description' => 'partial'
+])]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Get(
+            security: 'is_granted("ACCOUNT_VIEW", object.getAccount())'
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Post(
+            processor: MovementCreateProcessor::class,
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Patch(
+            security: 'is_granted("ACCOUNT_EDIT", object.getAccount())'
+        ),
+        new Delete(
+            security: 'is_granted("ACCOUNT_EDIT", object.getAccount())'
+        )
     ],
     normalizationContext: ['groups' => ['movement:read']],
     denormalizationContext: ['groups' => ['movement:write']]
@@ -39,7 +59,7 @@ class Movement
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['movement:read', 'movement:write'])]
+    #[Groups(['movement:read'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 150)]

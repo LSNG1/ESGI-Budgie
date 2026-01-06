@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -14,7 +13,6 @@ export default function RegisterForm({ userId }) {
     oldPassword: "",
     phone: "",
     fiscalNum: "",
-    verified: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -96,13 +94,14 @@ export default function RegisterForm({ userId }) {
         lastname: form.lastname,
         email: form.email,
         phone: form.phone,
-        fiscalNum: form.fiscalNum,
-        verified: false
+        fiscalNum: form.fiscalNum
       };
 
       if (form.password) {
-        const salt = await bcrypt.genSalt(10);
-        formData.password = await bcrypt.hash(form.password, salt);
+        formData.password = form.password;
+        if (userId) {
+          formData.oldPassword = form.oldPassword;
+        }
       }
 
       if (userId) {
