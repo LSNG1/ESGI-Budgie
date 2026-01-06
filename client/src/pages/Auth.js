@@ -7,7 +7,7 @@ export default function Auth() {
 
   return (
     <div className="h-full flex items-center justify-center overflow-auto">
-      <div className="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md">
+      <div className="bg-white p-8 rounded-2xl shadow-[0_0_10px_rgba(0,0,0,0.10)] w-full w-1/2 mt-30">
 
         <h1 className="text-3xl font-bold text-center mb-6">
           {mode === "login" ? "Connexion" : "Inscription"}
