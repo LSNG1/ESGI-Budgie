@@ -117,9 +117,15 @@ export default function MovementForm({
   const submitLabel =
     lockType && formData.type === "expense"
       ? "Ajouter la dépense"
-      : lockType && formData.type === "income"
+    : lockType && formData.type === "income"
       ? "Ajouter le revenu"
       : "Ajouter le mouvement";
+  const emptyAccountMessage =
+    defaultType === "expense"
+      ? "Aucun compte disponible pour ajouter une dépense."
+      : defaultType === "income"
+      ? "Aucun compte disponible pour ajouter un revenu."
+      : "Aucun compte disponible pour ajouter un mouvement.";
 
   return (
     <div className="p-5 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] bg-white">
@@ -142,6 +148,9 @@ export default function MovementForm({
                 ))}
               </select>
               {accountsError && <p className="text-sm text-red-500 mt-1">{accountsError}</p>}
+              {!accountsError && accounts.length === 0 && (
+                <p className="text-sm text-gray-500 mt-1">{emptyAccountMessage}</p>
+              )}
             </>
           )}
           <input

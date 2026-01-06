@@ -38,6 +38,7 @@ export default function AccountList({ className = "" }) {
         nextBalances[item.id] = item.balance;
       });
       setBalances(nextBalances);
+      setBalanceError(null);
     } catch (err) {
       console.error(err);
       setBalanceError("Impossible de charger les soldes.");
