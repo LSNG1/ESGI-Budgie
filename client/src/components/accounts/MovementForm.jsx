@@ -7,6 +7,7 @@ export default function MovementForm({
   onSuccess,
   defaultType = "",
   lockType = false,
+  variant = "card",
 }) {
   const { addToast } = useToast();
   const [accounts, setAccounts] = useState([]);
@@ -127,76 +128,122 @@ export default function MovementForm({
       ? "Aucun compte disponible pour ajouter un revenu."
       : "Aucun compte disponible pour ajouter un mouvement.";
 
+  const containerClassName =
+    variant === "modal" ? "" : "p-5 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] bg-white";
+  const formClassName = variant === "modal" ? "space-y-4" : "space-y-5 max-w-md";
+
   return (
-    <div className="p-5 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] bg-white">
-      <form onSubmit={handleSubmit} className="space-y-5 max-w-md">
+    <div className={containerClassName}>
+      <form onSubmit={handleSubmit} className={formClassName}>
+        {!accountId && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Compte *
+            </label>
+            <select
+              name="account"
+              value={formData.account}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            >
+              <option value="">Sélectionner un compte</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={`/api/accounts/${account.id}`}>
+                  {account.name}
+                </option>
+              ))}
+            </select>
+            {accountsError && <p className="text-sm text-red-500 mt-1">{accountsError}</p>}
+            {!accountsError && accounts.length === 0 && (
+              <p className="text-sm text-gray-500 mt-1">{emptyAccountMessage}</p>
+            )}
+            {!accountsError && accounts.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                Le mouvement sera rattaché à ce compte.
+              </p>
+            )}
+          </div>
+        )}
+
         <div>
-          {!accountId && (
-            <>
-              <select
-                name="account"
-                value={formData.account}
-                onChange={handleChange}
-                className="w-full p-2 border-b border-slate-700 outline-none"
-                required
-              >
-                <option value="">Sélectionner un compte</option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={`/api/accounts/${account.id}`}>
-                    {account.name}
-                  </option>
-                ))}
-              </select>
-              {accountsError && <p className="text-sm text-red-500 mt-1">{accountsError}</p>}
-              {!accountsError && accounts.length === 0 && (
-                <p className="text-sm text-gray-500 mt-1">{emptyAccountMessage}</p>
-              )}
-            </>
-          )}
+          <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-2 border-b border-slate-700 outline-none"
-            placeholder="Nom"
+            className="w-full p-2 border border-gray-300 rounded"
+            placeholder="Ex : Loyer, Salaire, Abonnement Netflix"
             required
           />
-          {lockType ? (
-            <input
-              type="text"
-              value={typeLabel}
-              className="w-full p-2 border-b border-slate-700 outline-none mt-2 bg-gray-50"
-              disabled
-            />
-          ) : (
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="w-full p-2 border-b border-slate-700 outline-none mt-2"
-              required
-            >
-              <option value="">Sélectionner le type</option>
-              <option value="income">Revenu</option>
-              <option value="expense">Dépense</option>
-            </select>
-          )}
-          <input
-            type="number"
-            name="amount"
-            value={formData.amount}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description (optionnel)
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
             onChange={handleChange}
-            className="w-full p-2 border-b border-slate-700 outline-none mt-2"
-            placeholder="Montant"
-            required
+            className="w-full p-2 border border-gray-300 rounded"
+            placeholder="Détails complémentaires"
+            rows={3}
           />
-          <div className="flex flex-row gap-2">
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+            {lockType ? (
+              <input
+                type="text"
+                value={typeLabel}
+                className="w-full p-2 border border-gray-300 rounded bg-gray-50"
+                disabled
+              />
+            ) : (
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              >
+                <option value="">Sélectionner le type</option>
+                <option value="income">Revenu</option>
+                <option value="expense">Dépense</option>
+              </select>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Montant (€) *
+            </label>
+            <input
+              type="number"
+              name="amount"
+              value={formData.amount}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Ex : 250"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Fréquence *</label>
+          <div className="grid gap-2 sm:grid-cols-2">
             <select
               name="frequencyType"
               value={formData.frequencyType}
               onChange={handleChange}
-              className="w-full p-2 border-b border-slate-700 outline-none mt-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             >
               <option value="">Sélectionner la fréquence</option>
@@ -208,35 +255,52 @@ export default function MovementForm({
               name="frequencyN"
               value={formData.frequencyN}
               onChange={handleChange}
-              className="w-full p-2 border-b border-slate-700 outline-none mt-2"
+              className="w-full p-2 border border-gray-300 rounded"
               placeholder="N"
+              min="1"
               disabled={formData.frequencyType !== "every_n_months"}
             />
           </div>
-          <div className="flex flex-row gap-2">
+          <p className="text-xs text-gray-500 mt-1">Ex : 1 = mensuel, 12 = annuel.</p>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date de début *
+            </label>
             <input
               type="date"
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
-              className="w-full p-2 border-b border-slate-700 outline-none mt-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date de fin (optionnel)
+            </label>
             <input
               type="date"
               name="endDate"
               value={formData.endDate}
               onChange={handleChange}
-              className="w-full p-2 border-b border-slate-700 outline-none mt-2"
+              className="w-full p-2 border border-gray-300 rounded"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Laissez vide pour une récurrence sans fin.
+            </p>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-[#0353a4] text-white hover:bg-cyan-600 py-2 rounded-lg font-semibold transition mt-4"
-          >
-            {submitLabel}
-          </button>
         </div>
+
+        <button
+          type="submit"
+          className="w-full bg-[#0353a4] text-white hover:bg-cyan-600 py-2 rounded-lg font-semibold transition"
+        >
+          {submitLabel}
+        </button>
       </form>
     </div>
   );

@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use App\Doctrine\Filter\MovementSearchFilter;
 use App\Repository\MovementRepository;
 use App\State\MovementCreateProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,6 +23,7 @@ use DateTimeImmutable;
     'name' => 'partial',
     'description' => 'partial'
 ])]
+#[ApiFilter(MovementSearchFilter::class)]
 #[ApiResource(
     operations: [
         new Get(

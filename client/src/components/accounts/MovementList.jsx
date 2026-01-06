@@ -216,21 +216,23 @@ export default function MovementList({ movements }) {
           {movementList.map((movement) => (
             <li
               key={movement.id}
-              className="bg-white hover:bg-gray-100 flex flex-row justify-between p-2 border-b border-gray-200"
+              className="bg-white hover:bg-gray-100 flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-2 border-b border-gray-200"
             >
-              <div className="flex flex-row gap-5 items-center">
-                <h3 className="font-semibold">{movement.name}</h3>
+              <div className="grid w-full items-center gap-2 sm:grid-cols-[minmax(0,1fr)_120px_180px]">
+                <h3 className="font-semibold truncate">{movement.name}</h3>
                 <p
-                  className={`text-sm ${
+                  className={`text-sm sm:text-left ${
                     movement.type === "income" ? "text-green-500" : "text-red-500"
                   }`}
                 >
                   {movement.type === "income" ? "Revenu" : "Dépense"}
                 </p>
-                <p className="text-sm text-black">Montant: {formatCurrency(movement.amount)}</p>
+                <p className="text-sm text-black sm:text-left">
+                  Montant: {formatCurrency(movement.amount)}
+                </p>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 md:shrink-0">
                 <button
                   onClick={() => deleteMovement(movement.id)}
                   className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg"

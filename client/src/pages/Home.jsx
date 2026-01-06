@@ -43,16 +43,22 @@ export default function Home() {
       </div>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
+              className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"
               aria-label="Fermer"
             >
               x
             </button>
-            <AccountForm onSuccess={handleSuccess} />
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold">Nouveau compte</h2>
+              <p className="text-sm text-gray-500">
+                Renseignez les informations principales pour créer un compte.
+              </p>
+            </div>
+            <AccountForm onSuccess={handleSuccess} variant="modal" showTitle={false} />
           </div>
         </div>
       )}

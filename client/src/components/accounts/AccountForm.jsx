@@ -3,7 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../context/ToastContext";
 
-export default function AccountForm({ onSuccess, accountId }) {
+export default function AccountForm({
+  onSuccess,
+  accountId,
+  variant = "card",
+  showTitle = true,
+}) {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [formData, setFormData] = useState({
@@ -17,6 +22,10 @@ export default function AccountForm({ onSuccess, accountId }) {
   });
 
   const formTitle = accountId ? "Modifier le compte" : "Créer un nouveau compte";
+  const containerClassName =
+    variant === "modal"
+      ? "space-y-5"
+      : "max-w-md mx-auto p-6 bg-white rounded-lg shadow-md";
 
   useEffect(() => {
     if (!accountId) return;
@@ -99,69 +108,115 @@ export default function AccountForm({ onSuccess, accountId }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">{formTitle}</h2>
+    <div className={containerClassName}>
+      {showTitle && <h2 className="text-2xl font-bold mb-4">{formTitle}</h2>}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Nom du compte"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-        <select
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        >
-          <option value="">Sélectionner le type de compte</option>
-          <option value="depot">Dépôt</option>
-          <option value="savings">Épargne</option>
-          <option value="credit">Crédit</option>
-        </select>
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <input
-          type="number"
-          name="taxRate"
-          placeholder="Taux d'imposition (%)"
-          value={formData.taxRate}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <input
-          type="number"
-          name="rateOfPay"
-          placeholder="Taux de rémunération (%)"
-          value={formData.rateOfPay}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <input
-          type="number"
-          name="overdraft"
-          placeholder="Découvert autorisé"
-          value={formData.overdraft}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <input
-          type="date"
-          name="createdAt"
-          placeholder="Date de création"
-          value={formData.createdAt}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nom du compte
+            </label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Nom du compte"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Type de compte
+            </label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            >
+              <option value="">Sélectionner le type</option>
+              <option value="depot">Dépôt</option>
+              <option value="savings">Épargne</option>
+              <option value="credit">Crédit</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date de création
+            </label>
+            <input
+              type="date"
+              name="createdAt"
+              value={formData.createdAt}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Taux d'imposition (%)
+            </label>
+            <input
+              type="number"
+              name="taxRate"
+              placeholder="0"
+              value={formData.taxRate}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Taux de rémunération (%)
+            </label>
+            <input
+              type="number"
+              name="rateOfPay"
+              placeholder="0"
+              value={formData.rateOfPay}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Découvert autorisé
+            </label>
+            <input
+              type="number"
+              name="overdraft"
+              placeholder="0"
+              value={formData.overdraft}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+            />
+          </div>
+        </div>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"

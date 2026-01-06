@@ -3,27 +3,27 @@ import axios from "axios";
 import MovementList from "../components/accounts/MovementList";
 import MovementForm from "../components/accounts/MovementForm";
 
-export default function ExpensesPage() {
-  const [expenses, setExpenses] = useState([]);
+export default function RevenuesPage() {
+  const [revenues, setRevenues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  const fetchExpenses = async (nextSearch = search) => {
+  const fetchRevenues = async (nextSearch = search) => {
     setLoading(true);
     setError(null);
     try {
-      const params = { type: "expense" };
+      const params = { type: "income" };
       if (nextSearch.trim()) {
         params.q = nextSearch;
       }
       const response = await axios.get("/api/movements", { params });
       const items = response.data["hydra:member"] || response.data.member || [];
-      setExpenses(items);
+      setRevenues(items);
     } catch (err) {
-      console.error("Erreur lors du chargement des dépenses :", err);
-      setError("Impossible de charger les dépenses.");
+      console.error("Erreur lors du chargement des revenus :", err);
+      setError("Impossible de charger les revenus.");
     } finally {
       setLoading(false);
     }
@@ -31,26 +31,26 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     const handle = setTimeout(() => {
-      fetchExpenses(search);
+      fetchRevenues(search);
     }, 300);
     return () => clearTimeout(handle);
   }, [search]);
 
   const handleSuccess = () => {
     setIsOpen(false);
-    fetchExpenses(search);
+    fetchRevenues(search);
   };
 
   return (
     <div className="h-full flex flex-col items-center justify-start p-6 space-y-6 overflow-auto">
       <div className="w-full max-w-5xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center gap-3 justify-between">
-          <h1 className="text-2xl font-bold">Dépenses</h1>
+          <h1 className="text-2xl font-bold">Revenus</h1>
           <button
             onClick={() => setIsOpen(true)}
             className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition"
           >
-            + Nouvelle dépense
+            + Nouveau revenu
           </button>
         </div>
 
@@ -65,7 +65,7 @@ export default function ExpensesPage() {
         {loading && <p className="text-gray-500">Chargement...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        {!loading && !error && <MovementList movements={expenses} />}
+        {!loading && !error && <MovementList movements={revenues} />}
       </div>
 
       {isOpen && (
@@ -79,16 +79,16 @@ export default function ExpensesPage() {
               x
             </button>
             <div className="mb-4">
-              <h2 className="text-2xl font-bold">Nouvelle dépense</h2>
+              <h2 className="text-2xl font-bold">Nouveau revenu</h2>
               <p className="text-sm text-gray-500">
-                Ajoutez une dépense ponctuelle ou récurrente liée à un compte.
+                Ajoutez un revenu ponctuel ou récurrent (salaire, prime, etc.).
               </p>
             </div>
-            <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900 mb-4">
-              Conseil : utilisez “Tous les N mois” pour les charges récurrentes
-              (1 = mensuel, 12 = annuel).
+            <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-sm text-emerald-900 mb-4">
+              Astuce : laissez la date de fin vide pour un revenu récurrent sans
+              limite.
             </div>
-            <MovementForm onSuccess={handleSuccess} defaultType="expense" lockType variant="modal" />
+            <MovementForm onSuccess={handleSuccess} defaultType="income" lockType variant="modal" />
           </div>
         </div>
       )}

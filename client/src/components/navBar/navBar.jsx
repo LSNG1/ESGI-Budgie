@@ -33,6 +33,9 @@ export default function NavBar() {
             <Link to="/expenses" className="hover:opacity-80 transition font-medium">
               Dépenses
             </Link>
+            <Link to="/revenues" className="hover:opacity-80 transition font-medium">
+              Revenus
+            </Link>
             <Link to="/shared" className="hover:opacity-80 transition font-medium">
               Partages
             </Link>

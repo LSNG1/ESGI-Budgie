@@ -58,7 +58,7 @@ export default function LandingPage() {
             <div>
               <h3 className="text-xl font-semibold text-gray-700 mb-4">📈 Tableau de bord</h3>
               <p className="text-gray-600 mb-4">
-                Visualisez d'un coup d'œil tous vos comptes avec leurs soldes actuels. Le solde total de tous vos comptes est calculé automatiquement.
+                Visualisez d'un coup d'oeil tous vos comptes avec leurs soldes actuels. Le solde total de tous vos comptes est calculé automatiquement.
               </p>
               <div className="bg-[#0353a4] rounded-lg p-4 text-white">
                 <div className="flex justify-between items-center">

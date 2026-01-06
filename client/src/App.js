@@ -11,6 +11,7 @@ import AccountPage from "./pages/AccountPage";
 import AccountEdit from "./pages/AccountEdit";
 import Profil from "./pages/Profil";
 import ExpensesPage from "./pages/ExpensesPage";
+import RevenuesPage from "./pages/RevenuesPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import SharedAccounts from "./pages/SharedAccounts";
 import AdminPage from "./pages/AdminPage";
@@ -65,6 +66,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <ExpensesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/revenues"
+            element={
+              <ProtectedRoute>
+                <RevenuesPage />
               </ProtectedRoute>
             }
           />
