@@ -4,22 +4,37 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
+use App\Entity\UserAccount;
 use App\Repository\AccountRepository;
+use App\State\AccountCreateProcessor;
+use App\State\AccountDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Get(
+            security: 'is_granted("ACCOUNT_VIEW", object)'
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Post(
+            processor: AccountCreateProcessor::class,
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Patch(
+            security: 'is_granted("ACCOUNT_EDIT", object)'
+        ),
+        new Delete(
+            processor: AccountDeleteProcessor::class,
+            security: 'is_granted("ACCOUNT_EDIT", object)'
+        )
     ],
     normalizationContext: ['groups' => ['account:read']],
     denormalizationContext: ['groups' => ['account:write']]
@@ -66,9 +81,16 @@ class Account
     #[ORM\OneToMany(targetEntity: Movement::class, mappedBy: 'account')]
     private Collection $movements;
 
+    /**
+     * @var Collection<int, UserAccount>
+     */
+    #[ORM\OneToMany(targetEntity: UserAccount::class, mappedBy: 'account', orphanRemoval: true)]
+    private Collection $userAccounts;
+
     public function __construct()
     {
         $this->movements = new ArrayCollection();
+        $this->userAccounts = new ArrayCollection();
         $this->createdAt = new DateTimeImmutable();
     }
 
@@ -185,6 +207,35 @@ class Account
             // set the owning side to null (unless already changed)
             if ($movement->getAccount() === $this) {
                 $movement->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserAccount>
+     */
+    public function getUserAccounts(): Collection
+    {
+        return $this->userAccounts;
+    }
+
+    public function addUserAccount(UserAccount $userAccount): static
+    {
+        if (!$this->userAccounts->contains($userAccount)) {
+            $this->userAccounts->add($userAccount);
+            $userAccount->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAccount(UserAccount $userAccount): static
+    {
+        if ($this->userAccounts->removeElement($userAccount)) {
+            if ($userAccount->getAccount() === $this) {
+                $userAccount->setAccount(null);
             }
         }
 

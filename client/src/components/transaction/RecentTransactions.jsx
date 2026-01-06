@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { generateOccurrences, parseIriId } from "../../utils/movements";
 
-export default function RecentTransactions({ limit = 10 }) {
+export default function RecentTransactions({ limit = 10, className = "" }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -23,10 +24,14 @@ export default function RecentTransactions({ limit = 10 }) {
     setError(null);
 
     try {
-      // Récupérer tous les comptes de l'utilisateur
-      const accountsResponse = await axios.get(`http://localhost:8000/user-account/${user.id}`);
-      const userAccounts = accountsResponse.data.accounts || [];
-      const accountIds = userAccounts.map((ua) => ua.account.id.toString());
+      const [accountsResponse, movementsResponse, exceptionsResponse] = await Promise.all([
+        axios.get("/api/accounts"),
+        axios.get("/api/movements"),
+        axios.get("/api/movement_exceptions"),
+      ]);
+
+      const accounts = accountsResponse.data["hydra:member"] || accountsResponse.data.member || [];
+      const accountIds = accounts.map((account) => account.id.toString());
 
       if (accountIds.length === 0) {
         setTransactions([]);
@@ -34,9 +39,10 @@ export default function RecentTransactions({ limit = 10 }) {
         return;
       }
 
-      // Récupérer toutes les transactions
-      const movementsResponse = await axios.get("http://localhost:8000/api/movements");
-      const movements = movementsResponse.data.member || movementsResponse.data["hydra:member"] || [];
+      const movements =
+        movementsResponse.data.member || movementsResponse.data["hydra:member"] || [];
+      const exceptionItems =
+        exceptionsResponse.data.member || exceptionsResponse.data["hydra:member"] || [];
 
       if (!Array.isArray(movements)) {
         setTransactions([]);
@@ -44,36 +50,38 @@ export default function RecentTransactions({ limit = 10 }) {
         return;
       }
 
-      // Traiter les transactions pour générer toutes les occurrences
-      const allTransactions = [];
-
-      movements.forEach((movement) => {
-        // Extraire l'ID du compte depuis la chaîne "/api/accounts/{id}"
-        let movementAccountId = null;
-        if (movement.account) {
-          if (typeof movement.account === "string") {
-            const match = movement.account.match(/\/api\/accounts\/(\d+)/);
-            movementAccountId = match ? match[1] : null;
-          } else if (movement.account.id) {
-            movementAccountId = movement.account.id.toString();
-          }
+      const exceptionsByMovement = {};
+      exceptionItems.forEach((exception) => {
+        const movementId = parseIriId(exception.movement);
+        if (!movementId) return;
+        if (!exceptionsByMovement[movementId]) {
+          exceptionsByMovement[movementId] = [];
         }
+        exceptionsByMovement[movementId].push(exception);
+      });
 
-        // Filtrer par les comptes de l'utilisateur
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+
+      const allTransactions = [];
+      movements.forEach((movement) => {
+        const movementAccountId = parseIriId(movement.account)?.toString();
         if (movementAccountId && accountIds.includes(movementAccountId)) {
-          const occurrences = generateOccurrences(movement);
-          // Ajouter l'ID du compte à chaque occurrence
+          const occurrences = generateOccurrences(
+            movement,
+            exceptionsByMovement[movement.id] || [],
+            today
+          );
           occurrences.forEach((occ) => {
             occ.accountId = movementAccountId;
-            occ.accountName = userAccounts.find(
-              (ua) => ua.account.id.toString() === movementAccountId
-            )?.account.name || "Compte";
+            occ.accountName =
+              accounts.find((account) => account.id.toString() === movementAccountId)?.name ||
+              "Compte";
           });
           allTransactions.push(...occurrences);
         }
       });
 
-      // Trier par date (plus récent en premier) et prendre les N dernières
       allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
       setTransactions(allTransactions.slice(0, limit));
     } catch (err) {
@@ -82,56 +90,6 @@ export default function RecentTransactions({ limit = 10 }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Génère toutes les occurrences d'une transaction jusqu'à aujourd'hui
-  const generateOccurrences = (movement) => {
-    const occurrences = [];
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-
-    const startDate = new Date(movement.startDate);
-    const endDate = movement.endDate ? new Date(movement.endDate) : null;
-
-    if (movement.frequencyType === "once") {
-      if (startDate <= today && (!endDate || startDate <= endDate)) {
-        occurrences.push({
-          id: `${movement.id}-0`,
-          name: movement.name,
-          description: movement.description,
-          type: movement.type,
-          amount: parseFloat(movement.amount),
-          date: movement.startDate,
-          isRecurring: false,
-        });
-      }
-    } else if (movement.frequencyType === "every_n_months") {
-      const frequencyN = movement.frequencyN || 1;
-      let currentDate = new Date(startDate);
-      let occurrenceIndex = 0;
-
-      while (currentDate <= today) {
-        if (endDate && currentDate > endDate) {
-          break;
-        }
-
-        occurrences.push({
-          id: `${movement.id}-${occurrenceIndex}`,
-          name: movement.name,
-          description: movement.description,
-          type: movement.type,
-          amount: parseFloat(movement.amount),
-          date: currentDate.toISOString().split("T")[0],
-          isRecurring: true,
-        });
-
-        currentDate = new Date(currentDate);
-        currentDate.setMonth(currentDate.getMonth() + frequencyN);
-        occurrenceIndex++;
-      }
-    }
-
-    return occurrences;
   };
 
   const formatCurrency = (amount) => {
@@ -152,9 +110,11 @@ export default function RecentTransactions({ limit = 10 }) {
     });
   };
 
+  const cardClassName = `bg-white rounded-lg shadow-md border border-gray-200 ${className}`;
+
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className={`${cardClassName} p-6`}>
         <h2 className="text-xl font-bold text-gray-800 mb-4">Dernières transactions</h2>
         <p className="text-gray-500 text-center py-4">Chargement...</p>
       </div>
@@ -163,7 +123,7 @@ export default function RecentTransactions({ limit = 10 }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className={`${cardClassName} p-6`}>
         <h2 className="text-xl font-bold text-gray-800 mb-4">Dernières transactions</h2>
         <p className="text-red-500 text-center py-4">{error}</p>
       </div>
@@ -171,7 +131,7 @@ export default function RecentTransactions({ limit = 10 }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 w-full max-w-xl">
+    <div className={`${cardClassName} p-4 w-full flex flex-col`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-gray-800">Dernières transactions</h2>
         <button
@@ -185,7 +145,7 @@ export default function RecentTransactions({ limit = 10 }) {
       {transactions.length === 0 ? (
         <p className="text-gray-500 text-center py-4">Aucune transaction récente</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-auto flex-1">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
@@ -226,9 +186,7 @@ export default function RecentTransactions({ limit = 10 }) {
                   </td>
                   <td
                     className={`px-4 py-2 text-sm text-right font-semibold ${
-                      transaction.type === "income"
-                        ? "text-green-600"
-                        : "text-red-600"
+                      transaction.type === "income" ? "text-green-600" : "text-red-600"
                     }`}
                   >
                     {transaction.type === "income" ? "+" : "-"}
@@ -243,4 +201,3 @@ export default function RecentTransactions({ limit = 10 }) {
     </div>
   );
 }
-

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -14,16 +13,16 @@ export default function RegisterForm({ userId }) {
     oldPassword: "",
     phone: "",
     fiscalNum: "",
-    verified: false,
   });
 
+  const [submitError, setSubmitError] = useState("");
   const [errors, setErrors] = useState({});
   const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:8000/api/users/${userId}`)
+      axios.get(`/api/users/${userId}`)
         .then(response => {
           const user = response.data;
           setForm(prev => ({
@@ -89,6 +88,8 @@ export default function RegisterForm({ userId }) {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!validateForm()) return;
+    setSubmitError("");
+    setErrors({});
 
     try {
       const formData = {
@@ -96,24 +97,25 @@ export default function RegisterForm({ userId }) {
         lastname: form.lastname,
         email: form.email,
         phone: form.phone,
-        fiscalNum: form.fiscalNum,
-        verified: false
+        fiscalNum: form.fiscalNum
       };
 
       if (form.password) {
-        const salt = await bcrypt.genSalt(10);
-        formData.password = await bcrypt.hash(form.password, salt);
+        formData.password = form.password;
+        if (userId) {
+          formData.oldPassword = form.oldPassword;
+        }
       }
 
       if (userId) {
         await axios.patch(
-          `http://localhost:8000/api/users/${userId}`,
+          `/api/users/${userId}`,
           formData,
           { headers: { 'Content-Type': 'application/merge-patch+json' } }
         );
       } else {
         const response = await axios.post(
-          'http://localhost:8000/api/users',
+          "/api/users",
           formData,
           { headers: { 'Content-Type': 'application/ld+json' } }
         );
@@ -125,13 +127,37 @@ export default function RegisterForm({ userId }) {
             email: response.data.email,
             phone: response.data.phone,
             fiscalNum: response.data.fiscalNum,
-            verified: response.data.verified
+            verified: response.data.verified,
+            roles: response.data.roles,
+            subscription: response.data.subscription
           });
         }
       }
 
       navigate("/home");
     } catch (error) {
+      const data = error?.response?.data;
+      const violations = Array.isArray(data?.violations) ? data.violations : [];
+      if (violations.length > 0) {
+        const fieldErrors = {};
+        violations.forEach((violation) => {
+          const key = violation.propertyPath || "form";
+          if (!fieldErrors[key]) {
+            fieldErrors[key] = violation.message;
+          }
+        });
+        setErrors((prev) => ({ ...prev, ...fieldErrors }));
+        if (fieldErrors.form) {
+          setSubmitError(fieldErrors.form);
+        }
+      } else {
+        const message =
+          data?.detail ||
+          data?.error ||
+          data?.["hydra:description"] ||
+          "Erreur lors de l'inscription.";
+        setSubmitError(message);
+      }
       console.error("Erreur lors de l'envoi :", error);
     }
   }

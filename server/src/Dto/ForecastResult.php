@@ -5,13 +5,14 @@ namespace App\Dto;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use App\State\ForecastProvider;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
         new Get(
             uriTemplate: '/accounts/{id}/forecast',
-            provider: ForecastProvider::class
+            provider: ForecastProvider::class,
+            security: 'is_granted("ROLE_USER")'
         )
     ],
     normalizationContext: ['groups' => ['forecast:read']]

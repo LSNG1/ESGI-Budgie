@@ -11,41 +11,48 @@ export default function Home() {
   const handleSuccess = () => {
     setIsOpen(false);
     setRefreshKey((prevKey) => prevKey + 1);
-  }
+  };
 
   return (
     <div className="h-full flex flex-col items-center justify-start p-6 space-y-6 overflow-auto">
-      <div className="mt-10 flex flex-row justify-between items-start w-11/12">
-        {/* Mini tableau des dernières transactions */}
-        <RecentTransactions limit={5} />
-        <div>
-          <div className="relative flex items-end justify-between px-6">
-            <h1 className="text-2xl font-bold">Mes Comptes</h1>
-            <button onClick={() => setIsOpen(true)} className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition">
-              + Nouveau compte
-            </button>
+      <div className="mt-10 w-full max-w-6xl">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-stretch">
+          <div className="w-full xl:flex-1">
+            <RecentTransactions limit={5} className="h-full min-h-[420px]" />
           </div>
-          <AccountList key={refreshKey} />
+          <div className="w-full xl:flex-1">
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col h-full min-h-[420px]">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl font-bold text-gray-800">Mes comptes</h2>
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition"
+                >
+                  + Nouveau compte
+                </button>
+              </div>
+              <div className="mt-4 flex-1 overflow-auto">
+                <AccountList key={refreshKey} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      {/* Dashboard avec métriques et graphique */}
-      <div className="w-11/12">
+      <div className="w-full max-w-6xl">
         <Dashboard />
       </div>
-
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
-
             <button
               onClick={() => setIsOpen(false)}
               className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
+              aria-label="Fermer"
             >
-              ✕
+              x
             </button>
             <AccountForm onSuccess={handleSuccess} />
-
           </div>
         </div>
       )}

@@ -4,20 +4,35 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\MovementExceptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: MovementExceptionRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'movement' => 'exact'
+])]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Get(
+            security: 'is_granted("ACCOUNT_VIEW", object.getMovement().getAccount())'
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Post(
+            securityPostDenormalize: 'is_granted("ACCOUNT_EDIT", object.getMovement().getAccount())'
+        ),
+        new Patch(
+            security: 'is_granted("ACCOUNT_EDIT", object.getMovement().getAccount())'
+        ),
+        new Delete(
+            security: 'is_granted("ACCOUNT_EDIT", object.getMovement().getAccount())'
+        )
     ],
     normalizationContext: ['groups' => ['exception:read']],
     denormalizationContext: ['groups' => ['exception:write']]
@@ -34,6 +49,10 @@ class MovementException
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['exception:read','exception:write'])]
     private ?Movement $movement = null;
+
+    #[ORM\Column(length: 150)]
+    #[Groups(['exception:read','exception:write'])]
+    private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['exception:read','exception:write'])]
@@ -81,6 +100,18 @@ class MovementException
     public function setMovement(?Movement $movement): static
     {
         $this->movement = $movement;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }

@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
   const { login } = useAuth();
 
   function handleChange(e) {
@@ -15,21 +16,28 @@ export default function LoginForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    axios.post('http://localhost:8000/api/login', form,
-        {   
+    setErrorMessage("");
+    axios.post("/api/login", form,
+        {
             headers: {
-                'Content-Type': 'application/ld+json'
+                'Content-Type': 'application/json'
             }
         })
-        .then(response => {
-            console.log("Login réussi :", response.data);
-            // Sauvegarder l'utilisateur dans le contexte
-            if (response.data.user) {
-              login(response.data.user);
+        .then(async () => {
+            const me = await axios.get("/api/me");
+            if (me.data) {
+              login(me.data);
             }
             navigate("/home");
         })
         .catch(error => {
+            const data = error?.response?.data;
+            const message =
+              data?.detail ||
+              data?.error ||
+              data?.["hydra:description"] ||
+              "Erreur lors de la connexion.";
+            setErrorMessage(message);
             console.error("Erreur lors du login :", error);
         });
   }
@@ -39,6 +47,7 @@ export default function LoginForm() {
       <Input label="Email" name="email" type="email" value={form.email} onChange={handleChange} />
       <Input label="Mot de passe" name="password" type="password" value={form.password} onChange={handleChange} />
 
+      {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
       <button className="w-full bg-cyan-500 hover:bg-cyan-600 py-2 rounded-lg font-semibold transition">
         Se connecter
       </button>

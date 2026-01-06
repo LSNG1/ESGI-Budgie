@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { generateOccurrences, parseIriId } from "../../utils/movements";
 
 export default function Transaction({ accountId }) {
   const [transactions, setTransactions] = useState([]);
@@ -19,45 +20,50 @@ export default function Transaction({ accountId }) {
     setError(null);
 
     try {
-      // Récupérer toutes les transactions
-      const response = await axios.get("http://localhost:8000/api/movements");
+      const [movementsResponse, exceptionsResponse] = await Promise.all([
+        axios.get("/api/movements", {
+          params: {
+            account: `/api/accounts/${accountId}`,
+          },
+        }),
+        axios.get("/api/movement_exceptions"),
+      ]);
 
-      // Traiter les transactions pour générer toutes les occurrences
-      const allTransactions = [];
-      // API Platform retourne les données dans "member" (format standard)
-      const movements = response.data.member || response.data["hydra:member"] || [];
+      const movements =
+        movementsResponse.data.member || movementsResponse.data["hydra:member"] || [];
+      const exceptionItems =
+        exceptionsResponse.data.member || exceptionsResponse.data["hydra:member"] || [];
+      const exceptionsByMovement = {};
 
-      // Vérifier que movements est bien un tableau
+      exceptionItems.forEach((exception) => {
+        const movementId = parseIriId(exception.movement);
+        if (!movementId) return;
+        if (!exceptionsByMovement[movementId]) {
+          exceptionsByMovement[movementId] = [];
+        }
+        exceptionsByMovement[movementId].push(exception);
+      });
+
       if (!Array.isArray(movements)) {
         console.error("La réponse n'est pas un tableau:", movements);
         setError("Format de réponse inattendu");
         return;
       }
 
-      movements.forEach((movement) => {
-        // Extraire l'ID du compte depuis la chaîne "/api/accounts/{id}"
-        let movementAccountId = null;
-        if (movement.account) {
-          if (typeof movement.account === "string") {
-            // Format: "/api/accounts/6"
-            const match = movement.account.match(/\/api\/accounts\/(\d+)/);
-            movementAccountId = match ? match[1] : null;
-          } else if (movement.account.id) {
-            // Format: objet avec id
-            movementAccountId = movement.account.id.toString();
-          }
-        }
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
 
-        // Filtrer par compte
+      const allTransactions = [];
+      movements.forEach((movement) => {
+        const movementAccountId = parseIriId(movement.account);
         if (movementAccountId && movementAccountId === accountId.toString()) {
-          const occurrences = generateOccurrences(movement);
+          const exceptions = exceptionsByMovement[movement.id] || [];
+          const occurrences = generateOccurrences(movement, exceptions, today);
           allTransactions.push(...occurrences);
         }
       });
 
-      // Trier par date (plus récent en premier)
       allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
       setTransactions(allTransactions);
     } catch (err) {
       console.error("Erreur lors de la récupération des transactions :", err);
@@ -69,60 +75,6 @@ export default function Transaction({ accountId }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Génère toutes les occurrences d'une transaction jusqu'à aujourd'hui
-  const generateOccurrences = (movement) => {
-    const occurrences = [];
-    const today = new Date();
-    today.setHours(23, 59, 59, 999); // Fin de la journée d'aujourd'hui
-
-    const startDate = new Date(movement.startDate);
-    const endDate = movement.endDate ? new Date(movement.endDate) : null;
-
-    if (movement.frequencyType === "once") {
-      // Transaction unique
-      if (startDate <= today && (!endDate || startDate <= endDate)) {
-        occurrences.push({
-          id: `${movement.id}-0`,
-          name: movement.name,
-          description: movement.description,
-          type: movement.type,
-          amount: parseFloat(movement.amount),
-          date: movement.startDate,
-          isRecurring: false,
-        });
-      }
-    } else if (movement.frequencyType === "every_n_months") {
-      // Transaction récurrente
-      const frequencyN = movement.frequencyN || 1;
-      let currentDate = new Date(startDate);
-
-      let occurrenceIndex = 0;
-      while (currentDate <= today) {
-        // Vérifier si on n'a pas dépassé la date de fin
-        if (endDate && currentDate > endDate) {
-          break;
-        }
-
-        occurrences.push({
-          id: `${movement.id}-${occurrenceIndex}`,
-          name: movement.name,
-          description: movement.description,
-          type: movement.type,
-          amount: parseFloat(movement.amount),
-          date: currentDate.toISOString().split("T")[0],
-          isRecurring: true,
-        });
-
-        // Passer au mois suivant selon la fréquence
-        currentDate = new Date(currentDate);
-        currentDate.setMonth(currentDate.getMonth() + frequencyN);
-        occurrenceIndex++;
-      }
-    }
-
-    return occurrences;
   };
 
   const formatCurrency = (amount) => {
@@ -151,17 +103,15 @@ export default function Transaction({ accountId }) {
     );
   }
 
-  // Grouper les transactions par mois
   const transactionsByMonth = {};
   transactions.forEach((transaction) => {
-    const monthKey = transaction.date.substring(0, 7); // YYYY-MM
+    const monthKey = transaction.date.substring(0, 7);
     if (!transactionsByMonth[monthKey]) {
       transactionsByMonth[monthKey] = [];
     }
     transactionsByMonth[monthKey].push(transaction);
   });
 
-  // Calculer les totaux par mois
   const monthlyTotals = {};
   Object.keys(transactionsByMonth).forEach((monthKey) => {
     const monthTransactions = transactionsByMonth[monthKey];
@@ -218,7 +168,6 @@ export default function Transaction({ accountId }) {
 
               return (
                 <div key={monthKey} className="border border-gray-200 rounded-lg overflow-hidden">
-                  {/* En-tête du mois */}
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold text-gray-800">
@@ -241,7 +190,6 @@ export default function Transaction({ accountId }) {
                     </div>
                   </div>
 
-                  {/* Liste des transactions du mois */}
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -310,4 +258,3 @@ export default function Transaction({ accountId }) {
     </div>
   );
 }
-

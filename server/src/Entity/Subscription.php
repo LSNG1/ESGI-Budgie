@@ -6,16 +6,26 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
 use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Get(
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")'
+        ),
+        new Post(
+            security: 'is_granted("ROLE_ADMIN")'
+        ),
+        new Patch(
+            security: 'is_granted("ROLE_ADMIN")'
+        ),
+        new Delete(
+            security: 'is_granted("ROLE_ADMIN")'
+        )
     ],
     normalizationContext: ['groups' => ['subscription:read']],
     denormalizationContext: ['groups' => ['subscription:write']]

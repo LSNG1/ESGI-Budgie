@@ -9,6 +9,8 @@ use App\Entity\Account;
 use App\Service\ForecastCalculator;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ForecastProvider implements ProviderInterface
@@ -17,6 +19,7 @@ class ForecastProvider implements ProviderInterface
         private EntityManagerInterface $em,
         private ForecastCalculator $calculator,
         private RequestStack $requestStack,
+        private Security $security,
     ) {
     }
 
@@ -27,6 +30,10 @@ class ForecastProvider implements ProviderInterface
 
         if (!$account) {
             return null;
+        }
+
+        if (!$this->security->isGranted('ACCOUNT_VIEW', $account)) {
+            throw new AccessDeniedException('Access denied.');
         }
 
         $request = $this->requestStack->getCurrentRequest();

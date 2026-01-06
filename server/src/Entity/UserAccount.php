@@ -6,17 +6,18 @@ use App\Repository\UserAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\{Get, GetCollection, Post, Patch, Delete};
-use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\{Get, GetCollection};
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserAccountRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Get(
+            security: 'object.getUser() == user'
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")'
+        )
     ],
     normalizationContext: ['groups' => ['user_account:read']],
     denormalizationContext: ['groups' => ['user_account:write']]
