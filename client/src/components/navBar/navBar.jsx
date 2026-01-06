@@ -21,7 +21,7 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#005f73] text-white shadow-lg rounded-b-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0353a4] text-white shadow-lg rounded-b-2xl">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo à gauche */}
@@ -41,7 +41,7 @@ export default function NavBar() {
               to="/abonnement"
               className="hover:opacity-80 transition font-medium"
             >
-              Abonnement
+              Transaction
             </Link>
             <Link
               to="/aide"
@@ -53,7 +53,7 @@ export default function NavBar() {
             {/* Affichage conditionnel : nom de l'utilisateur ou "Se connecter" */}
             {user ? (
               <div className="flex items-center gap-4">
-                <Link to="/compte" className="hover:opacity-80 transition font-medium">
+                <Link to="/profil" className="hover:opacity-80 transition font-medium">
                     <span className="font-medium">{getUserDisplayName()}</span>
                 </Link>
                 <button onClick={handleLogout} className="hover:opacity-80 transition font-medium">
