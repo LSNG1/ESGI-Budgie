@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import Dashboard from "../components/dashboard/Dashboard";
+import GlobalForecast from "../components/forecast/GlobalForecast";
 
 export default function Board() {
   return (
@@ -7,6 +8,9 @@ export default function Board() {
       {/* Dashboard avec métriques et graphique */}
       <div className="w-full max-w-6xl">
         <Dashboard />
+      </div>
+      <div className="w-full max-w-6xl">
+        <GlobalForecast />
       </div>
 
     </div>

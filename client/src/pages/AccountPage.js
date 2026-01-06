@@ -12,6 +12,8 @@ export default function AccountPage() {
 
   const [account, setAccount] = useState([]);
   const [movements, setMovements] = useState([]);
+  const [currentBalance, setCurrentBalance] = useState(null);
+  const [balanceError, setBalanceError] = useState(null);
 
   const fetchAccount = async () => {
     try {
@@ -38,6 +40,24 @@ export default function AccountPage() {
     }
   };
 
+  const fetchCurrentBalance = async (accountId) => {
+    const targetDate = new Date().toISOString().split("T")[0];
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/accounts/${accountId}/forecast`,
+        {
+          params: {
+            targetDate: targetDate,
+          },
+        }
+      );
+      setCurrentBalance(response.data?.balance ?? null);
+      setBalanceError(null);
+    } catch (error) {
+      console.error("Erreur lors de la r\u00e9cup\u00e9ration du solde :", error);
+      setBalanceError("Impossible de charger le solde.");
+    }
+  };
 
   useEffect(() => {
     fetchAccount();
@@ -47,9 +67,32 @@ export default function AccountPage() {
     if (account?.id) fetchMovements();
   }, [account]);
 
+  useEffect(() => {
+    if (account?.id) fetchCurrentBalance(account.id);
+  }, [account?.id]);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
   return (
     <div className="h-full flex flex-col items-center justify-start overflow-auto p-4 space-y-6">
-      <h1 className="text-4xl font-bold">Compte: {account.name}</h1>
+      <div className="text-center">
+        <h1 className="text-4xl font-bold">Compte: {account.name}</h1>
+        <p className="text-sm text-gray-600 mt-1">
+          Solde actuel:{" "}
+          {currentBalance !== null
+            ? formatCurrency(currentBalance)
+            : balanceError
+            ? "N/A"
+            : "..."}
+        </p>
+      </div>
       <div className="flex flex-row w-11/12 justify-between gap-4">
         <div className="h-full w-1/3">
           <MovementForm accountId={id} onSuccess={fetchMovements} />

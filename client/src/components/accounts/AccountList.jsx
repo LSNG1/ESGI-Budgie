@@ -7,6 +7,9 @@ export default function AccountList() {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [balances, setBalances] = useState({});
+    const [balanceError, setBalanceError] = useState(null);
+    const [balanceDate] = useState(() => new Date().toISOString().split("T")[0]);
 
     const navigate = useNavigate();
 
@@ -24,8 +27,28 @@ export default function AccountList() {
         }
     };
 
+    const fetchBalances = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/forecast`, {
+                params: {
+                    targetDate: balanceDate
+                }
+            });
+            const items = response.data?.accounts || [];
+            const nextBalances = {};
+            items.forEach((item) => {
+                nextBalances[item.id] = item.balance;
+            });
+            setBalances(nextBalances);
+        } catch (err) {
+            console.error(err);
+            setBalanceError("Impossible de charger les soldes.");
+        }
+    };
+
     useEffect(() => {
         fetchAccounts();
+        fetchBalances();
     }, []);
 
 
@@ -41,6 +64,17 @@ export default function AccountList() {
                   <div>
                     <h2 className="font-semibold">{account.name}</h2>
                     <p className="text-sm text-gray-500">Type: {account.type}</p>
+                    <p className="text-sm text-gray-500">
+                      Solde:{" "}
+                      {balances[account.id] !== undefined
+                        ? new Intl.NumberFormat("fr-FR", {
+                            style: "currency",
+                            currency: "EUR",
+                          }).format(balances[account.id])
+                        : balanceError
+                        ? "N/A"
+                        : "-"}
+                    </p>
                   </div>
                   <div className="mt-4 flex gap-2">
                     <button onClick={() => navigate(`/account/${account.id}`)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
