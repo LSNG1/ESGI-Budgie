@@ -15,6 +15,7 @@ export default function RegisterForm({ userId }) {
     fiscalNum: "",
   });
 
+  const [submitError, setSubmitError] = useState("");
   const [errors, setErrors] = useState({});
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -87,6 +88,8 @@ export default function RegisterForm({ userId }) {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!validateForm()) return;
+    setSubmitError("");
+    setErrors({});
 
     try {
       const formData = {
@@ -131,6 +134,28 @@ export default function RegisterForm({ userId }) {
 
       navigate("/home");
     } catch (error) {
+      const data = error?.response?.data;
+      const violations = Array.isArray(data?.violations) ? data.violations : [];
+      if (violations.length > 0) {
+        const fieldErrors = {};
+        violations.forEach((violation) => {
+          const key = violation.propertyPath || "form";
+          if (!fieldErrors[key]) {
+            fieldErrors[key] = violation.message;
+          }
+        });
+        setErrors((prev) => ({ ...prev, ...fieldErrors }));
+        if (fieldErrors.form) {
+          setSubmitError(fieldErrors.form);
+        }
+      } else {
+        const message =
+          data?.detail ||
+          data?.error ||
+          data?.["hydra:description"] ||
+          "Erreur lors de l'inscription.";
+        setSubmitError(message);
+      }
       console.error("Erreur lors de l'envoi :", error);
     }
   }
@@ -236,6 +261,7 @@ export default function RegisterForm({ userId }) {
         {errors.fiscalNum && <p className="text-red-500 text-sm mt-1">{errors.fiscalNum}</p>}
       </div>
 
+      {submitError && <p className="text-red-500 text-sm">{submitError}</p>}
       <button className="w-full bg-cyan-500 hover:bg-cyan-600 py-2 rounded-lg font-semibold transition">
         {userId ? "Mettre à jour le profil" : "S'inscrire"}
       </button>
