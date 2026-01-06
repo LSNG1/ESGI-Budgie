@@ -137,109 +137,112 @@ export default function RegisterForm({ userId }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label className="block text-sm mb-1">Prénom</label>
-        <input
-          name="firstname"
-          value={form.firstname}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.firstname && <p className="text-red-500 text-sm mt-1">{errors.firstname}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Nom</label>
-        <input
-          name="lastname"
-          value={form.lastname}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.lastname && <p className="text-red-500 text-sm mt-1">{errors.lastname}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-      </div>
-
-      {userId && (
+    <form onSubmit={handleSubmit} className=" flex flex-row justify-between">
+      <div className="w-2/5 flex flex-col gap-5">
         <div>
-          <label className="block text-sm mb-1">Ancien mot de passe</label>
+          <input
+            name="firstname"
+            value={form.firstname}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Prenom"
+          />
+          {errors.firstname && <p className="text-red-500 text-sm mt-1">{errors.firstname}</p>}
+        </div>
+
+        <div>
+          <input
+            name="lastname"
+            value={form.lastname}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Nom"
+          />
+          {errors.lastname && <p className="text-red-500 text-sm mt-1">{errors.lastname}</p>}
+        </div>
+
+        <div>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Email"
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+
+        {userId && (
+          <div>
+            <input
+              type="password"
+              name="oldPassword"
+              value={form.oldPassword}
+              onChange={handleChange}
+              className="w-full p-2 border-b border-slate-700 outline-none"
+              placeholder="Ancien mot de passe"
+            />
+            {errors.oldPassword && <p className="text-red-500 text-sm mt-1">{errors.oldPassword}</p>}
+          </div>
+        )}
+
+        <div>
           <input
             type="password"
-            name="oldPassword"
-            value={form.oldPassword}
+            name="password"
+            value={form.password}
             onChange={handleChange}
-            className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Mot de passe"
           />
-          {errors.oldPassword && <p className="text-red-500 text-sm mt-1">{errors.oldPassword}</p>}
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
         </div>
-      )}
 
-      <div>
-        <label className="block text-sm mb-1">{userId ? "Nouveau mot de passe" : "Mot de passe"}</label>
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        <div>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Confirmer le mot de passe"
+          />
+          {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+        </div>
+      </div>
+      <div className="w-2/5 flex flex-col gap-5">
+        <div>
+          <input
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Téléphone"
+          />
+          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+        </div>
+
+        <div>
+          <input
+            name="fiscalNum"
+            value={form.fiscalNum}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border-b border-slate-700 outline-none"
+            placeholder="Numéro fiscal"
+          />
+          {errors.fiscalNum && <p className="text-red-500 text-sm mt-1">{errors.fiscalNum}</p>}
+        </div>
+        <button className="w-full bg-cyan-500 hover:bg-cyan-600 py-2 rounded-lg font-semibold transition">
+          {userId ? "Mettre à jour le profil" : "S'inscrire"}
+        </button>
       </div>
 
-      <div>
-        <label className="block text-sm mb-1">Confirmer le mot de passe</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Téléphone</label>
-        <input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Numéro fiscal</label>
-        <input
-          name="fiscalNum"
-          value={form.fiscalNum}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
-        />
-        {errors.fiscalNum && <p className="text-red-500 text-sm mt-1">{errors.fiscalNum}</p>}
-      </div>
-
-      <button className="w-full bg-cyan-500 hover:bg-cyan-600 py-2 rounded-lg font-semibold transition">
-        {userId ? "Mettre à jour le profil" : "S'inscrire"}
-      </button>
     </form>
   );
 }

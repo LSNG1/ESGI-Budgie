@@ -49,9 +49,9 @@ export default function LoginForm() {
 function Input({ label, name, type, value, onChange }) {
   return (
     <div>
-      <label className="block text-sm mb-1">{label}</label>
       <input
-        className="w-full p-2 rounded bg-slate-800 border border-slate-700 focus:border-cyan-500 outline-none"
+        className="w-full p-2 border-b border-slate-700 outline-none"
+        placeholder={label}
         {...{ name, type, value, onChange, required: true }}
       />
     </div>
