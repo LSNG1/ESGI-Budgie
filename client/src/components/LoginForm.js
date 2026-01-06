@@ -7,7 +7,6 @@ export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const { login } = useAuth();
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,14 +17,14 @@ export default function LoginForm() {
   function handleSubmit(e) {
     e.preventDefault();
     setErrorMessage("");
-    axios.post(`${apiBaseUrl}/api/login`, form,
+    axios.post('https://localhost:8000/api/login', form,
         {
             headers: {
                 'Content-Type': 'application/json'
             }
         })
         .then(async () => {
-            const me = await axios.get(`${apiBaseUrl}/api/me`);
+            const me = await axios.get('https://localhost:8000/api/me');
             if (me.data) {
               login(me.data);
             }
