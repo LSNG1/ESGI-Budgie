@@ -4,6 +4,7 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\AccountInvite;
 use App\Entity\Movement;
 use App\Entity\User;
 use App\Entity\UserAccount;
@@ -35,6 +36,10 @@ class UserDeleteProcessor implements ProcessorInterface
                         $this->em->remove($exception);
                     }
                     $this->em->remove($movement);
+                }
+                $invites = $this->em->getRepository(AccountInvite::class)->findBy(['account' => $account]);
+                foreach ($invites as $invite) {
+                    $this->em->remove($invite);
                 }
                 $this->em->remove($account);
             }

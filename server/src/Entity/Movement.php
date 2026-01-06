@@ -106,6 +106,7 @@ class Movement
      * @var Collection<int, MovementException>
      */
     #[ORM\OneToMany(targetEntity: MovementException::class, mappedBy: 'movement')]
+    #[Groups(['movement:read'])]
     private Collection $exceptions;
 
     public function __construct()

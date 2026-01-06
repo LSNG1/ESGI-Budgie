@@ -1,14 +1,16 @@
-import { useParams } from "react-router-dom";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import MovementForm from "../components/accounts/MovementForm";
 import MovementList from "../components/accounts/MovementList";
+import AccountShare from "../components/accounts/AccountShare";
 import Forecast from "../components/forecast/Forecast";
 import Transaction from "../components/transaction/Transaction";
 
 export default function AccountPage() {
   const { id } = useParams();
+  const location = useLocation();
+  const shareRef = useRef(null);
 
   const [account, setAccount] = useState([]);
   const [movements, setMovements] = useState([]);
@@ -19,7 +21,6 @@ export default function AccountPage() {
     try {
       const response = await axios.get(`http://localhost:8000/api/accounts/${id}`);
       setAccount(response.data);
-      console.log(response.data)
     } catch (error) {
       console.error("Erreur lors de la récupération des informations du compte :", error);
     }
@@ -29,10 +30,9 @@ export default function AccountPage() {
     try {
       const response = await axios.get(`http://localhost:8000/api/movements`, {
         params: {
-          account: `/api/accounts/${account.id}`
-        }
+          account: `/api/accounts/${account.id}`,
+        },
       });
-      console.log("Movements API Response:", response.data);
       const members = response.data["hydra:member"] || response.data.member || [];
       setMovements(members);
     } catch (err) {
@@ -47,14 +47,14 @@ export default function AccountPage() {
         `http://localhost:8000/api/accounts/${accountId}/forecast`,
         {
           params: {
-            targetDate: targetDate,
+            targetDate,
           },
         }
       );
       setCurrentBalance(response.data?.balance ?? null);
       setBalanceError(null);
     } catch (error) {
-      console.error("Erreur lors de la r\u00e9cup\u00e9ration du solde :", error);
+      console.error("Erreur lors de la récupération du solde :", error);
       setBalanceError("Impossible de charger le solde.");
     }
   };
@@ -70,6 +70,13 @@ export default function AccountPage() {
   useEffect(() => {
     if (account?.id) fetchCurrentBalance(account.id);
   }, [account?.id]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("share") === "1" && shareRef.current) {
+      shareRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [location.search]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -96,9 +103,12 @@ export default function AccountPage() {
       <div className="flex flex-row w-11/12 justify-between gap-4">
         <div className="h-full w-1/3">
           <MovementForm accountId={id} onSuccess={fetchMovements} />
+          <div className="mt-4" ref={shareRef}>
+            <AccountShare accountId={id} />
+          </div>
         </div>
         <div className="h-full w-2/3">
-          <MovementList movements={movements} accountId={id} />
+          <MovementList movements={movements} />
         </div>
       </div>
       <div className="flex flex-row h-500 gap-4 w-11/12 justify-between">

@@ -50,6 +50,10 @@ class MovementException
     #[Groups(['exception:read','exception:write'])]
     private ?Movement $movement = null;
 
+    #[ORM\Column(length: 150)]
+    #[Groups(['exception:read','exception:write'])]
+    private ?string $name = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['exception:read','exception:write'])]
     private ?string $description = null;
@@ -96,6 +100,18 @@ class MovementException
     public function setMovement(?Movement $movement): static
     {
         $this->movement = $movement;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }

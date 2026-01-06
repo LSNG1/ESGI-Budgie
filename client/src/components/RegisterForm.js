@@ -127,7 +127,9 @@ export default function RegisterForm({ userId }) {
             email: response.data.email,
             phone: response.data.phone,
             fiscalNum: response.data.fiscalNum,
-            verified: response.data.verified
+            verified: response.data.verified,
+            roles: response.data.roles,
+            subscription: response.data.subscription
           });
         }
       }

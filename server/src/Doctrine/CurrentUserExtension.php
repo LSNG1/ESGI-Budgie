@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use App\Entity\Account;
+use App\Entity\AccountInvite;
 use App\Entity\Movement;
 use App\Entity\MovementException;
 use App\Entity\User;
@@ -73,6 +74,18 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface
                 ->join(sprintf('%s.userAccounts', $accountAlias), $userAccountAlias)
                 ->andWhere(sprintf('%s.user = :current_user', $userAccountAlias))
                 ->setParameter('current_user', $user);
+        }
+
+        if ($resourceClass === AccountInvite::class) {
+            $accountAlias = $queryNameGenerator->generateJoinAlias('account');
+            $userAccountAlias = $queryNameGenerator->generateJoinAlias('userAccount');
+            $queryBuilder
+                ->join(sprintf('%s.account', $rootAlias), $accountAlias)
+                ->join(sprintf('%s.userAccounts', $accountAlias), $userAccountAlias)
+                ->andWhere(sprintf('%s.email = :user_email OR (%s.user = :current_user AND %s.role = :owner_role)', $rootAlias, $userAccountAlias, $userAccountAlias))
+                ->setParameter('current_user', $user)
+                ->setParameter('user_email', $user->getUserIdentifier())
+                ->setParameter('owner_role', 'owner');
         }
     }
 }

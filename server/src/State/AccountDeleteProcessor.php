@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Account;
+use App\Entity\AccountInvite;
 use App\Entity\Movement;
 use App\Entity\UserAccount;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,6 +37,11 @@ class AccountDeleteProcessor implements ProcessorInterface
         $userAccounts = $this->em->getRepository(UserAccount::class)->findBy(['account' => $data]);
         foreach ($userAccounts as $userAccount) {
             $this->em->remove($userAccount);
+        }
+
+        $invites = $this->em->getRepository(AccountInvite::class)->findBy(['account' => $data]);
+        foreach ($invites as $invite) {
+            $this->em->remove($invite);
         }
 
         return $this->removeProcessor->process($data, $operation, $uriVariables, $context);

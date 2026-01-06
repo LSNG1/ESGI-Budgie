@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Movement;
 use App\Entity\User;
+use App\Repository\MovementRepository;
 use App\Repository\UserAccountRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -18,7 +19,8 @@ class MovementCreateProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private Security $security,
-        private UserAccountRepository $userAccountRepository
+        private UserAccountRepository $userAccountRepository,
+        private MovementRepository $movementRepository
     ) {
     }
 
@@ -48,6 +50,22 @@ class MovementCreateProcessor implements ProcessorInterface
         }
 
         $data->setUser($user);
+
+        $subscription = $user->getSubscription();
+        if ($subscription) {
+            $type = $data->getType();
+            if (!in_array($type, ['income', 'expense'], true)) {
+                throw new BadRequestHttpException('Movement type must be income or expense.');
+            }
+
+            $limit = $type === 'income' ? $subscription->getMaxIncomes() : $subscription->getMaxExpenses();
+            if ($limit !== null) {
+                $count = $this->movementRepository->countByAccountAndType($account, $type);
+                if ($count >= $limit) {
+                    throw new BadRequestHttpException('Movement limit reached for this account.');
+                }
+            }
+        }
 
         if ($data->getFrequencyType() === 'every_n_months' && (!$data->getFrequencyN() || $data->getFrequencyN() < 1)) {
             $data->setFrequencyN(1);

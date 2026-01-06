@@ -27,11 +27,11 @@ export default function GlobalForecast() {
       });
       setForecastData(response.data);
     } catch (err) {
-      console.error("Erreur lors de la r\u00e9cup\u00e9ration des pr\u00e9visions globales :", err);
+      console.error("Erreur lors de la récupération des prévisions globales :", err);
       setError(
         err.response?.data?.message ||
           err.response?.data?.hydra?.description ||
-          "Erreur lors de la r\u00e9cup\u00e9ration des pr\u00e9visions globales"
+          "Erreur lors de la récupération des prévisions globales"
       );
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ export default function GlobalForecast() {
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Pr\u00e9visions globales</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Prévisions globales</h2>
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium text-gray-700">
             Date cible :
@@ -68,7 +68,7 @@ export default function GlobalForecast() {
 
       {loading && (
         <div className="text-center py-8">
-          <p className="text-gray-500">Chargement des pr\u00e9visions...</p>
+          <p className="text-gray-500">Chargement des prévisions...</p>
         </div>
       )}
 
@@ -83,7 +83,7 @@ export default function GlobalForecast() {
           <div className="mb-6 p-4 bg-gradient-to-r from-[#0353a4] to-[#0a9396] rounded-lg text-white">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm opacity-90">Solde pr\u00e9vu au</p>
+                <p className="text-sm opacity-90">Solde prévu au</p>
                 <p className="text-lg font-semibold">
                   {new Date(forecastData.targetDate).toLocaleDateString("fr-FR", {
                     day: "numeric",
@@ -106,7 +106,7 @@ export default function GlobalForecast() {
           </div>
 
           {accounts.length === 0 ? (
-            <p className="text-gray-500">Aucun compte \u00e0 afficher.</p>
+            <p className="text-gray-500">Aucun compte à afficher.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">

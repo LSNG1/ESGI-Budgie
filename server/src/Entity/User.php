@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\{Delete, Get, Patch, Post};
+use ApiPlatform\Metadata\{Delete, Get, GetCollection, Patch, Post};
 use App\Repository\UserRepository;
 use App\State\CurrentUserProvider;
 use App\State\UserDeleteProcessor;
@@ -20,6 +20,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     operations: [
         new Post(
             processor: UserPasswordHasherProcessor::class
+        ),
+        new GetCollection(
+            security: 'is_granted("ROLE_ADMIN")'
         ),
         new Get(
             security: 'is_granted("ROLE_USER") and object == user'
@@ -66,6 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private array $roles = [];
 
     /**
@@ -96,6 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $verified = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['user:read', 'user:write'])]
     private ?Subscription $subscription = null;
 
     public function getId(): ?int

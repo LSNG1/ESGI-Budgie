@@ -1,59 +1,149 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-export default function MovementForm({accountId, onSuccess}) {
+import { useToast } from "../../context/ToastContext";
 
-
-  let account = `/api/accounts/${accountId}`;
+export default function MovementForm({
+  accountId,
+  onSuccess,
+  defaultType = "",
+  lockType = false,
+}) {
+  const { addToast } = useToast();
+  const [accounts, setAccounts] = useState([]);
+  const [accountsError, setAccountsError] = useState(null);
   const [formData, setFormData] = useState({
-    account: account,
+    account: "",
     name: "",
     description: "",
-    type: "",
-    amount: 0,
+    type: defaultType || "",
+    amount: "",
     frequencyType: "",
-    frequencyN: 0,
-    startDate: null,
-    endDate: null
-});
+    frequencyN: 1,
+    startDate: "",
+    endDate: "",
+  });
 
+  useEffect(() => {
+    if (!accountId) return;
+    setFormData((prev) => ({
+      ...prev,
+      account: `/api/accounts/${accountId}`,
+    }));
+  }, [accountId]);
 
+  useEffect(() => {
+    if (!defaultType) return;
+    setFormData((prev) => ({
+      ...prev,
+      type: defaultType,
+    }));
+  }, [defaultType]);
 
-const handleChange = (e) => {
+  useEffect(() => {
+    if (accountId) return;
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/accounts");
+        const members = response.data["hydra:member"] || response.data.member || [];
+        setAccounts(members);
+        setAccountsError(null);
+      } catch (err) {
+        console.error("Erreur lors du chargement des comptes :", err);
+        setAccountsError("Impossible de charger les comptes.");
+      }
+    };
+    fetchAccounts();
+  }, [accountId]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    setFormData({
-        ...formData,
-        [name]: value,
-    });
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.account) {
+      addToast("Veuillez sélectionner un compte.", "error");
+      return;
+    }
+
     const payload = {
       ...formData,
-      frequencyN: formData.frequencyN ? Number(formData.frequencyN) : 0
-
+      amount: formData.amount ? Number(formData.amount).toString() : "0",
+      frequencyN:
+        formData.frequencyType === "every_n_months" ? Number(formData.frequencyN || 1) : null,
+      endDate: formData.endDate || null,
     };
-    console.log(formData);
-    axios.post("http://localhost:8000/api/movements", payload, {
+
+    try {
+      await axios.post("http://localhost:8000/api/movements", payload, {
         headers: {
-            'Content-Type': 'application/ld+json'
-        }
-    })
-    .then(response => {
-        console.log("Mouvement ajouté avec succès :", response.data);
+          "Content-Type": "application/ld+json",
+        },
+      });
+      if (payload.type === "expense") {
+        addToast("Dépense ajoutée.", "success");
+      } else if (payload.type === "income") {
+        addToast("Revenu ajouté.", "success");
+      } else {
+        addToast("Mouvement ajouté.", "success");
+      }
+      if (onSuccess) {
         onSuccess();
-        // Réinitialiser le formulaire ou afficher un message de succès si nécessaire
-    })
-    .catch(error => {
-        console.error("Erreur lors de l'ajout du mouvement :", error);
-    });
-};
+      }
+      setFormData((prev) => ({
+        ...prev,
+        name: "",
+        description: "",
+        amount: "",
+        frequencyType: "",
+        frequencyN: 1,
+        startDate: "",
+        endDate: "",
+        type: defaultType || prev.type,
+      }));
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du mouvement :", error);
+      addToast("Impossible d'ajouter le mouvement.", "error");
+    }
+  };
+
+  const typeLabel =
+    formData.type === "income" ? "Revenu" : formData.type === "expense" ? "Dépense" : "";
+  const submitLabel =
+    lockType && formData.type === "expense"
+      ? "Ajouter la dépense"
+      : lockType && formData.type === "income"
+      ? "Ajouter le revenu"
+      : "Ajouter le mouvement";
 
   return (
-    <div className="p-5 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)]">
+    <div className="p-5 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] bg-white">
       <form onSubmit={handleSubmit} className="space-y-5 max-w-md">
         <div>
+          {!accountId && (
+            <>
+              <select
+                name="account"
+                value={formData.account}
+                onChange={handleChange}
+                className="w-full p-2 border-b border-slate-700 outline-none"
+                required
+              >
+                <option value="">Sélectionner un compte</option>
+                {accounts.map((account) => (
+                  <option key={account.id} value={`/api/accounts/${account.id}`}>
+                    {account.name}
+                  </option>
+                ))}
+              </select>
+              {accountsError && <p className="text-sm text-red-500 mt-1">{accountsError}</p>}
+            </>
+          )}
           <input
             type="text"
             name="name"
@@ -63,52 +153,65 @@ const handleSubmit = async (e) => {
             placeholder="Nom"
             required
           />
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full p-2 border-b border-slate-700 outline-none mt-2"
-          >
-            <option value="">Sélectionner le type</option>
-            <option value="income">Revenu</option>
-            <option value="expense">Dépense</option>
-          </select>
+          {lockType ? (
+            <input
+              type="text"
+              value={typeLabel}
+              className="w-full p-2 border-b border-slate-700 outline-none mt-2 bg-gray-50"
+              disabled
+            />
+          ) : (
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="w-full p-2 border-b border-slate-700 outline-none mt-2"
+              required
+            >
+              <option value="">Sélectionner le type</option>
+              <option value="income">Revenu</option>
+              <option value="expense">Dépense</option>
+            </select>
+          )}
           <input
             type="number"
             name="amount"
-            // value={formData.amount}
+            value={formData.amount}
             onChange={handleChange}
             className="w-full p-2 border-b border-slate-700 outline-none mt-2"
             placeholder="Montant"
+            required
           />
-          <div className="flex flex-row">
+          <div className="flex flex-row gap-2">
             <select
               name="frequencyType"
               value={formData.frequencyType}
               onChange={handleChange}
               className="w-full p-2 border-b border-slate-700 outline-none mt-2"
+              required
             >
               <option value="">Sélectionner la fréquence</option>
-              <option value="every_n_months">Chaque mois</option>
-              <option value="once">Une fois</option>
+              <option value="every_n_months">Tous les N mois</option>
+              <option value="once">Ponctuel</option>
             </select>
             <input
               type="number"
               name="frequencyN"
-              // value={formData.frequencyN}
+              value={formData.frequencyN}
               onChange={handleChange}
               className="w-full p-2 border-b border-slate-700 outline-none mt-2"
-              placeholder="Nombre de fréquences"
+              placeholder="N"
+              disabled={formData.frequencyType !== "every_n_months"}
             />
           </div>
-          <div className="flex flex-row">
+          <div className="flex flex-row gap-2">
             <input
               type="date"
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
               className="w-full p-2 border-b border-slate-700 outline-none mt-2"
-              placeholder="Date de début"
+              required
             />
             <input
               type="date"
@@ -116,18 +219,16 @@ const handleSubmit = async (e) => {
               value={formData.endDate}
               onChange={handleChange}
               className="w-full p-2 border-b border-slate-700 outline-none mt-2"
-              placeholder="Date de fin"
             />
           </div>
           <button
             type="submit"
             className="w-full bg-[#0353a4] text-white hover:bg-cyan-600 py-2 rounded-lg font-semibold transition mt-4"
           >
-            Ajouter le mouvement
+            {submitLabel}
           </button>
-          
         </div>
-        </form>
+      </form>
     </div>
   );
 }

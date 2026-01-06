@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\User;
+use App\Repository\SubscriptionRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -16,7 +17,8 @@ class UserPasswordHasherProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private UserPasswordHasherInterface $passwordHasher,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private SubscriptionRepository $subscriptionRepository
     ) {
     }
 
@@ -50,6 +52,14 @@ class UserPasswordHasherProcessor implements ProcessorInterface
 
         if (!$previousData instanceof User && $data->isVerified() === null) {
             $data->setVerified(false);
+        }
+
+        if (!$previousData instanceof User && $data->getSubscription() === null) {
+            $defaultSubscription = $this->subscriptionRepository->findOneBy(['name' => 'Gratuit'])
+                ?? $this->subscriptionRepository->findOneBy([], ['id' => 'ASC']);
+            if ($defaultSubscription) {
+                $data->setSubscription($defaultSubscription);
+            }
         }
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
