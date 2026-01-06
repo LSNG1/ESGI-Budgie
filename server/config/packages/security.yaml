@@ -16,21 +16,28 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
-        main:
+        api:
+            pattern: ^/api
             lazy: true
             provider: app_user_provider
-            entry_point: form_login
+            entry_point: json_login
             json_login:
                 check_path: /api/login
                 username_path: email
                 password_path: password
             logout:
                 path: /api/logout
+        main:
+            lazy: true
+            provider: app_user_provider
+            entry_point: form_login
             # Optional: keep form login for Twig pages
             form_login:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+            logout:
+                path: /logout
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -40,6 +47,7 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/api, roles: PUBLIC_ACCESS, methods: [OPTIONS] }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/logout, roles: PUBLIC_ACCESS }
@@ -58,5 +66,4 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
-
 
