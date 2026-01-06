@@ -16,7 +16,7 @@ export default function AccountEdit() {
         if (!isConfirmed) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/accounts/${id}`, {
+            await axios.delete(`/api/accounts/${id}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },

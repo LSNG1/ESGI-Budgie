@@ -20,7 +20,7 @@ export default function SubscriptionPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:8000/api/subscriptions");
+      const response = await axios.get("/api/subscriptions");
       const items = response.data["hydra:member"] || response.data.member || [];
       setPlans(items);
     } catch (err) {
@@ -38,7 +38,7 @@ export default function SubscriptionPage() {
 
     try {
       const response = await axios.patch(
-        `http://localhost:8000/api/users/${user.id}`,
+        `/api/users/${user.id}`,
         {
           subscription: `/api/subscriptions/${plan.id}`,
         },

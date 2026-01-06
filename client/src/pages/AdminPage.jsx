@@ -23,8 +23,8 @@ export default function AdminPage() {
     setError(null);
     try {
       const [usersResponse, subscriptionsResponse] = await Promise.all([
-        axios.get("http://localhost:8000/api/users"),
-        axios.get("http://localhost:8000/api/subscriptions"),
+        axios.get("/api/users"),
+        axios.get("/api/subscriptions"),
       ]);
       const userItems = usersResponse.data["hydra:member"] || usersResponse.data.member || [];
       const subscriptionItems =

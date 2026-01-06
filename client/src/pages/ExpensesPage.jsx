@@ -19,7 +19,7 @@ export default function ExpensesPage() {
         params.name = nextSearch;
         params.description = nextSearch;
       }
-      const response = await axios.get("http://localhost:8000/api/movements", { params });
+      const response = await axios.get("/api/movements", { params });
       const items = response.data["hydra:member"] || response.data.member || [];
       setExpenses(items);
     } catch (err) {

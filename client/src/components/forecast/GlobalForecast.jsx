@@ -20,7 +20,7 @@ export default function GlobalForecast() {
     setError(null);
 
     try {
-      const response = await axios.get("http://localhost:8000/api/forecast", {
+      const response = await axios.get("/api/forecast", {
         params: {
           targetDate: targetDate,
         },

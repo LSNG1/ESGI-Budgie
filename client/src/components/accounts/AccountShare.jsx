@@ -13,7 +13,7 @@ export default function AccountShare({ accountId }) {
   const fetchInvites = async () => {
     if (!accountIri) return;
     try {
-      const response = await axios.get("http://localhost:8000/api/account_invites", {
+      const response = await axios.get("/api/account_invites", {
         params: {
           account: accountIri,
         },
@@ -39,7 +39,7 @@ export default function AccountShare({ accountId }) {
         email,
         expiresAt: expiresAt || null,
       };
-      const response = await axios.post("http://localhost:8000/api/account_invites", payload, {
+      const response = await axios.post("/api/account_invites", payload, {
         headers: {
           "Content-Type": "application/ld+json",
         },
@@ -56,7 +56,7 @@ export default function AccountShare({ accountId }) {
 
   const handleDelete = async (inviteId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/account_invites/${inviteId}`);
+      await axios.delete(`/api/account_invites/${inviteId}`);
       addToast("Invitation révoquée.", "success");
       fetchInvites();
     } catch (err) {

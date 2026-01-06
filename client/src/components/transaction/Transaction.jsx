@@ -21,12 +21,12 @@ export default function Transaction({ accountId }) {
 
     try {
       const [movementsResponse, exceptionsResponse] = await Promise.all([
-        axios.get("http://localhost:8000/api/movements", {
+        axios.get("/api/movements", {
           params: {
             account: `/api/accounts/${accountId}`,
           },
         }),
-        axios.get("http://localhost:8000/api/movement_exceptions"),
+        axios.get("/api/movement_exceptions"),
       ]);
 
       const movements =

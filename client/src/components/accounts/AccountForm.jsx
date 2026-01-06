@@ -22,7 +22,7 @@ export default function AccountForm({ onSuccess, accountId }) {
     if (!accountId) return;
 
     axios
-      .get(`http://localhost:8000/api/accounts/${accountId}`)
+      .get(`/api/accounts/${accountId}`)
       .then((res) => {
         const account = res.data;
 
@@ -62,7 +62,7 @@ export default function AccountForm({ onSuccess, accountId }) {
 
     if (accountId) {
       axios
-        .patch(`http://localhost:8000/api/accounts/${accountId}`, payload, {
+        .patch(`/api/accounts/${accountId}`, payload, {
           headers: {
             "Content-Type": "application/merge-patch+json",
           },
@@ -80,7 +80,7 @@ export default function AccountForm({ onSuccess, accountId }) {
     }
 
     axios
-      .post("http://localhost:8000/api/accounts", payload, {
+      .post("/api/accounts", payload, {
         headers: {
           "Content-Type": "application/ld+json",
         },

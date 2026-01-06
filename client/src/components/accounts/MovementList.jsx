@@ -44,7 +44,7 @@ export default function MovementList({ movements }) {
 
   const deleteMovement = async (movementId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/movements/${movementId}`);
+      await axios.delete(`/api/movements/${movementId}`);
       setMovementList((prevList) => prevList.filter((m) => m.id !== movementId));
       addToast("Mouvement supprimé.", "success");
     } catch (error) {
@@ -89,7 +89,7 @@ export default function MovementList({ movements }) {
       };
 
       const response = await axios.patch(
-        `http://localhost:8000/api/movements/${editingMovement.id}`,
+        `/api/movements/${editingMovement.id}`,
         payload,
         {
           headers: {
@@ -111,7 +111,7 @@ export default function MovementList({ movements }) {
 
   const fetchExceptions = async (movementId) => {
     try {
-      const response = await axios.get("http://localhost:8000/api/movement_exceptions", {
+      const response = await axios.get("/api/movement_exceptions", {
         params: {
           movement: `/api/movements/${movementId}`,
         },
@@ -170,7 +170,7 @@ export default function MovementList({ movements }) {
         endDate: exceptionForm.endDate || null,
       };
 
-      await axios.post("http://localhost:8000/api/movement_exceptions", payload, {
+      await axios.post("/api/movement_exceptions", payload, {
         headers: {
           "Content-Type": "application/ld+json",
         },
@@ -197,7 +197,7 @@ export default function MovementList({ movements }) {
   const deleteException = async (exceptionId) => {
     if (!exceptionMovement) return;
     try {
-      await axios.delete(`http://localhost:8000/api/movement_exceptions/${exceptionId}`);
+      await axios.delete(`/api/movement_exceptions/${exceptionId}`);
       await fetchExceptions(exceptionMovement.id);
       addToast("Exception supprimée.", "success");
     } catch (error) {

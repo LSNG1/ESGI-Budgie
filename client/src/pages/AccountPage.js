@@ -19,7 +19,7 @@ export default function AccountPage() {
 
   const fetchAccount = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/accounts/${id}`);
+      const response = await axios.get(`/api/accounts/${id}`);
       setAccount(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des informations du compte :", error);
@@ -28,7 +28,7 @@ export default function AccountPage() {
 
   const fetchMovements = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/movements`, {
+      const response = await axios.get(`/api/movements`, {
         params: {
           account: `/api/accounts/${account.id}`,
         },
@@ -44,7 +44,7 @@ export default function AccountPage() {
     const targetDate = new Date().toISOString().split("T")[0];
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/accounts/${accountId}/forecast`,
+        `/api/accounts/${accountId}/forecast`,
         {
           params: {
             targetDate,

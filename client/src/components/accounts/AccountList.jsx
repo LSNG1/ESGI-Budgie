@@ -14,7 +14,7 @@ export default function AccountList({ className = "" }) {
 
   const fetchAccounts = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/accounts");
+      const response = await axios.get("/api/accounts");
       const members = response.data["hydra:member"] || response.data.member || [];
       setAccounts(members);
       setLoading(false);
@@ -27,7 +27,7 @@ export default function AccountList({ className = "" }) {
 
   const fetchBalances = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/forecast", {
+      const response = await axios.get("/api/forecast", {
         params: {
           targetDate: balanceDate,
         },

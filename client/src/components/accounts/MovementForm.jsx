@@ -43,7 +43,7 @@ export default function MovementForm({
     if (accountId) return;
     const fetchAccounts = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/accounts");
+        const response = await axios.get("/api/accounts");
         const members = response.data["hydra:member"] || response.data.member || [];
         setAccounts(members);
         setAccountsError(null);
@@ -80,7 +80,7 @@ export default function MovementForm({
     };
 
     try {
-      await axios.post("http://localhost:8000/api/movements", payload, {
+      await axios.post("/api/movements", payload, {
         headers: {
           "Content-Type": "application/ld+json",
         },

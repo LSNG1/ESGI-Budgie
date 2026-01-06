@@ -17,14 +17,14 @@ export default function LoginForm() {
   function handleSubmit(e) {
     e.preventDefault();
     setErrorMessage("");
-    axios.post('https://localhost:8000/api/login', form,
+    axios.post("/api/login", form,
         {
             headers: {
                 'Content-Type': 'application/json'
             }
         })
         .then(async () => {
-            const me = await axios.get('https://localhost:8000/api/me');
+            const me = await axios.get("/api/me");
             if (me.data) {
               login(me.data);
             }

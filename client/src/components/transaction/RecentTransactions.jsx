@@ -25,9 +25,9 @@ export default function RecentTransactions({ limit = 10, className = "" }) {
 
     try {
       const [accountsResponse, movementsResponse, exceptionsResponse] = await Promise.all([
-        axios.get("http://localhost:8000/api/accounts"),
-        axios.get("http://localhost:8000/api/movements"),
-        axios.get("http://localhost:8000/api/movement_exceptions"),
+        axios.get("/api/accounts"),
+        axios.get("/api/movements"),
+        axios.get("/api/movement_exceptions"),
       ]);
 
       const accounts = accountsResponse.data["hydra:member"] || accountsResponse.data.member || [];

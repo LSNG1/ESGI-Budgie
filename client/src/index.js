@@ -8,6 +8,8 @@ import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from "./context/ToastContext";
 
 axios.defaults.withCredentials = true;
+axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL || "https://localhost:8000";
+console.log("🚀 ~ axios.defaults.baseURL:", axios.defaults.baseURL)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

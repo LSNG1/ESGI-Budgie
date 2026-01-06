@@ -21,8 +21,8 @@ export default function SharedAccounts() {
     setError(null);
     try {
       const [userAccountsResponse, accountsResponse] = await Promise.all([
-        axios.get("http://localhost:8000/api/user_accounts"),
-        axios.get("http://localhost:8000/api/accounts"),
+        axios.get("/api/user_accounts"),
+        axios.get("/api/accounts"),
       ]);
 
       const userAccounts =
@@ -50,7 +50,7 @@ export default function SharedAccounts() {
   const fetchInvites = async () => {
     if (!user?.email) return;
     try {
-      const response = await axios.get("http://localhost:8000/api/account_invites", {
+      const response = await axios.get("/api/account_invites", {
         params: {
           status: "pending",
         },
@@ -78,7 +78,7 @@ export default function SharedAccounts() {
 
     const acceptFromLink = async () => {
       try {
-        await axios.post(`http://localhost:8000/api/account_invites/${inviteId}/accept`);
+        await axios.post(`/api/account_invites/${inviteId}/accept`);
         addToast("Invitation acceptée.", "success");
         navigate("/shared", { replace: true });
         fetchInvites();
@@ -95,7 +95,7 @@ export default function SharedAccounts() {
 
   const acceptInvite = async (inviteId) => {
     try {
-      await axios.post(`http://localhost:8000/api/account_invites/${inviteId}/accept`);
+      await axios.post(`/api/account_invites/${inviteId}/accept`);
       addToast("Invitation acceptée.", "success");
       fetchInvites();
       fetchSharedAccounts();
@@ -107,7 +107,7 @@ export default function SharedAccounts() {
 
   const declineInvite = async (inviteId) => {
     try {
-      await axios.post(`http://localhost:8000/api/account_invites/${inviteId}/decline`);
+      await axios.post(`/api/account_invites/${inviteId}/decline`);
       addToast("Invitation refusée.", "info");
       fetchInvites();
     } catch (err) {

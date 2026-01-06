@@ -26,7 +26,7 @@ export default function Forecast({ accountId }) {
 
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/accounts/${accountId}/forecast`,
+        `/api/accounts/${accountId}/forecast`,
         {
           params: {
             targetDate: targetDate,
